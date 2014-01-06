@@ -8,6 +8,8 @@ module Prestashop
       def initialize api_key, api_url
         @api_key = api_key
         self.api_url = api_url
+
+        raise InvalidCredentials unless self.test
       end
 
       def api_url= url
@@ -103,13 +105,8 @@ module Prestashop
       end
 
       # Test connection
-      def test_connection
-        begin
-          connection.get
-          true
-        rescue
-          false
-        end
+      def test
+        connection.get.status == 200 ? true : false
       end
     end
   end

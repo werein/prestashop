@@ -1,5 +1,5 @@
 require 'forwardable'
-require 'prestashop/client/errors'
+require 'prestashop/client/error'
 require 'prestashop/client/implementation'
 require 'prestashop/client/settings'
 
