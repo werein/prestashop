@@ -7,22 +7,22 @@ module Prestashop
       class << self
         def head conn, options = {}
           response = conn.connection.head conn.path(options)
-          response.success? ? response.body : raise(response.body)
+          response.success? ? response.body : raise(RequestFailed.new(response))
         end
 
         def delete conn, options = {}
           response = conn.connection.delete conn.path(options)
-          response.success? ? response.body : raise(response.body)
+          response.success? ? response.body : raise(RequestFailed.new(response))
         end
 
         def post conn, options = {}
           response = conn.connection.post conn.path(options), options[:payload]
-          response.success? ? response.body : raise(response.body)
+          response.success? ? response.body : raise(RequestFailed.new(response))
         end
 
         def put conn, options = {}
           response = conn.connection.put conn.path(options), options[:payload]
-          response.success? ? response.body : raise(response.body)
+          response.success? ? response.body : raise(RequestFailed.new(response))
         end
 
         def get conn, options = {}
@@ -35,7 +35,7 @@ module Prestashop
           end 
 
           response = conn.connection.get conn.path(options), params
-          response.success? ? response.body : raise(response.body)
+          response.success? ? response.body : raise(RequestFailed.new(response))
         end
 
         def upload conn, options = {}
@@ -49,7 +49,7 @@ module Prestashop
           
           response = conn.connection.post conn.upload_path(options), payload
           temp.close!
-          response.success? ? response.body : raise(response.body)
+          response.success? ? response.body : raise(RequestFailed.new(response))
         rescue OpenURI::HTTPError => e
           # File doesn't exist
         end

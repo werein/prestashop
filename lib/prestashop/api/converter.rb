@@ -18,6 +18,10 @@ module Prestashop
         xml_node_to_hash result.root
       end
 
+      def self.parse_error response
+        from_xml(response)[:errors][:error][:message]
+      end
+
       def self.create_nodes ml, source, mkey = nil
         unless source[:attr] and source[:val]
           source.each do |key, value| 

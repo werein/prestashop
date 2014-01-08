@@ -46,8 +46,9 @@ module Prestashop
         begin 
           response = Executor.get self, options
           Converter.from_xml response
-        rescue => e
-          raise e
+        rescue RequestFailed => e
+          response = Converter.parse_error e.response.body
+          raise RequestFailed.new(e), response
         end
       end
 
@@ -56,8 +57,9 @@ module Prestashop
         begin
           Executor.head self, options
           true
-        rescue => e
-          raise e
+        rescue RequestFailed => e
+          response = Converter.parse_error e.response.body
+          raise RequestFailed.new(e), response
         end
       end
 
@@ -67,8 +69,9 @@ module Prestashop
           options[:payload] = Converter.to_xml(options[:resource], options[:model], options[:payload]) if options[:payload]
           response = Executor.post self, options
           Converter.from_xml response
-        rescue => e
-          raise e
+        rescue RequestFailed => e
+          response = Converter.parse_error e.response.body
+          raise RequestFailed.new(e), "#{response}. XML SENT: #{options[:payload]}"
         end
       end
 
@@ -78,8 +81,9 @@ module Prestashop
           options[:payload] = Converter.to_xml(options[:resource], options[:model], options[:payload].merge(id: options[:id])) if options[:payload]
           response = Executor.put self, options
           Converter.from_xml response
-        rescue => e
-          raise e
+        rescue RequestFailed => e
+          response = Converter.parse_error e.response.body
+          raise RequestFailed.new(e), "#{response}. XML SENT: #{options[:payload]}"
         end
       end
 
@@ -88,8 +92,9 @@ module Prestashop
         begin
           Executor.delete self, options
           true
-        rescue => e
-          raise e
+        rescue RequestFailed => e
+          response = Converter.parse_error e.response.body
+          raise RequestFailed.new(e), response
         end
       end
 
