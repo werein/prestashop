@@ -8,7 +8,7 @@ module Prestashop
 
       def initialize args = {}
         @id_lang = settings.id_language
-        @name    = args.fetch(:name)
+        @name    = args.fetch(:name).plain
       end
 
       def hash

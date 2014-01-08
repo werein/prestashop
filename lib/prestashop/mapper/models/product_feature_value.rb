@@ -8,7 +8,7 @@ module Prestashop
 
       def initialize args = {}
         @id_lang    = settings.id_language
-        @value      = args.fetch(:value)
+        @value      = args.fetch(:value).plain
         @id_feature = args.fetch(:id_feature)
         @custom     = 0
       end
