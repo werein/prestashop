@@ -6,7 +6,7 @@ module Prestashop
       describe "invalid connection" do 
         it "should not be created" do 
           stub_request(:get, 'http://123:@localhost.com/api').to_return(status: [401, "Welcome to PrestaShop Webservice, please enter the authentication key as the login. No password required."])
-          ->{ Connection.new '123', 'http://localhost.com' }.must_raise Prestashop::Api::InvalidCredentials
+          ->{ Connection.new '123', 'http://localhost.com' }.must_raise InvalidCredentials
         end
       end
 
@@ -72,7 +72,7 @@ module Prestashop
 
         it "should raise error " do
           stub_request(:get, 'http://123:@localhost.com/api/users').to_return(status: [400])
-          ->{ connection.get resource: :users }.must_raise Prestashop::Api::RequestFailed    
+          ->{ connection.get resource: :users }.must_raise RequestFailed    
         end
       end
     end
