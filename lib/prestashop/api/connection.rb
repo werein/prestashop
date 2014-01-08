@@ -25,7 +25,7 @@ module Prestashop
           builder.url_prefix = api_url
           builder.request     :multipart
           builder.request     :url_encoded
-          builder.response    :logger
+          # builder.response    :logger
           builder.adapter     :net_http
           builder.basic_auth  api_key, ''
         end
@@ -103,9 +103,9 @@ module Prestashop
         begin
           response = Executor.upload self, options
           Converter.from_xml response
-        rescue => e
-          # Don't raise error (yet), when image isn't readable
-          # raise e 
+        rescue RequestFailed => e
+          response = Converter.parse_error e.response.body
+          raise RequestFailed.new(e), response
         end
       end
 

@@ -44,9 +44,8 @@ module Prestashop
           temp = Tempfile.new([basename, extname])
           temp.binmode
           temp.write open(options[:file]).read
-
+          sleep(1)
           payload = { image: Faraday::UploadIO.new(temp.path, 'image') }
-          
           response = conn.connection.post conn.upload_path(options), payload
           temp.close!
           response.success? ? response.body : raise(RequestFailed.new(response))
