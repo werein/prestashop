@@ -10,7 +10,7 @@ module Prestashop
           options[:file].each do |file|
             images << Client.current.connection.upload(options.merge!(type: 'images', file: file))
           end
-          images.map{|i| i[:image][:id] } if images
+          images.map{|i| i[:image][:id] } unless images.empty?
         else
           image = Client.current.connection.upload options.merge!(type: 'images')
           image[:image][:id] if image
