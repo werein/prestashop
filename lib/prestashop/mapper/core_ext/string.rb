@@ -70,4 +70,8 @@ String.class_eval do
   def html
     Prestashop::Client.settings.html_enabled ? self.iframed : self.relaxed
   end
+
+  def truncate number = 0
+    self.slice(0, number)
+  end
 end

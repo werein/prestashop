@@ -1,11 +1,11 @@
-unless defined?(Rails)
-  require 'active_resource'
-  require 'active_support'
-  require 'action_view'
-  require 'action_view/helpers'
+# unless defined?(Rails)
+#   require 'active_resource'
+#   require 'active_support'
+#   require 'action_view'
+#   require 'action_view/helpers'
 
-  include ActionView::Helpers
-end
+#   include ActionView::Helpers
+# end
 
 module Prestashop
   module Mapper
