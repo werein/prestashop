@@ -19,7 +19,7 @@ module Prestashop
         @meta_keywords    = args[:meta_keywords]
       end
 
-      # Category name, can't have some symbols and can't be longer than 63
+      # Category name can't have some symbols and can't be longer than 63
       def name
         @name.plain.truncate(61)
       end
@@ -59,16 +59,31 @@ module Prestashop
       end
 
       class << self
+
+        # Search for category based on args on cached categories, see #cache and #Client::Settings.categories_cache
+        # Returns founded category or nil
+        #
+        # ==== Parameters:
+        # opts [Hash]:
+        #   * +:id_parent+  - Parent category
+        #   * +:name+       - Name of category
+        #
         def find_in_cache args = {}
           found = settings.categories_cache.find do |c| 
             c[:id_parent][:val] == args[:id_parent] and c[:name].lang_search(args[:name]) unless c[:id_parent] == 0
           end
         end
 
+        # Requesting all on Prestashop API, displaying id, id_parent, name
         def cache
           all display: '[id, id_parent, name]'
         end
 
+        # Create new category based on given param, delimited by delimiter in settings
+        #
+        # ==== Example:
+        #   Category.create_from_name('Apple|iPhone') # => [1, 2]
+        #
         def create_from_name category_name
           if category_name and !category_name.empty?
             names = [category_name.split(settings.delimiter)].flatten!
