@@ -1,12 +1,12 @@
 module Prestashop
   module Api
-    class InvalidCredentials < RuntimeError
+    class InvalidCredentials < RuntimeError #:nodoc:
       def initialize
         super "Some configuration is invalid" 
       end
     end
 
-    class RequestFailed < RuntimeError
+    class RequestFailed < RuntimeError #:nodoc:
       attr_reader :response
       def initialize response
         @response = response

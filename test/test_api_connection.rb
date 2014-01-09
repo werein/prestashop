@@ -29,7 +29,7 @@ module Prestashop
         end
 
         describe 'with xml expecting' do 
-          before { Converter.expects(:from_xml) }
+          before { Converter.expects(:parse) }
 
           it "should get" do
             stub_request(:get, 'http://123:@localhost.com/api/users')
@@ -57,8 +57,8 @@ module Prestashop
           end
 
           # it "should upload" do
-          #   stub_request(:put, 'http://123:@localhost.com/api/users/1')
-          #   connection.upload resource: :users, model: :user, id: 1, file: 'steve.jpg'
+          #   stub_request(:post, 'http://123:@localhost.com/api/image/users/1')
+          #   connection.upload resource: :users, model: :user, type: :image, id: 1, file: 'steve.jpg'
           # end
         end
       end

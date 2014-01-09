@@ -8,6 +8,7 @@ module Prestashop
     extend SingleForwardable
     def_delegators :current, :connection, :settings
 
+    # Delegate to current user implementation
     def self.current
       Implementation.current
     end
