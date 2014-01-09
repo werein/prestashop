@@ -3,8 +3,8 @@ module Prestashop
     module Helper
       def self.calculate_price original_price, vat
         case [original_price.class]
-        when [Numeric]
-          original_price.round(4)
+        when [Fixnum]
+          original_price.to_f.round(4)
         when [String]
           original_price.to_f.round(4)
         when [Hash]
