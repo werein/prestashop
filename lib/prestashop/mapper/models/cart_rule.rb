@@ -1,3 +1,4 @@
+using Prestashop::Mapper::Refinement
 module Prestashop
   module Mapper
     class CartRule < Model

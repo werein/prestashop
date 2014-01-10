@@ -1,6 +1,7 @@
 require_relative 'test_helper'
 
-describe String do 
+using Prestashop::Mapper::Refinement
+describe 'String' do
   it "should not contains <>;=\#{}" do
     "<>st;r=i#n{g}".plain.must_equal "string"
   end

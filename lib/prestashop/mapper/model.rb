@@ -1,12 +1,4 @@
-# unless defined?(Rails)
-#   require 'active_resource'
-#   require 'active_support'
-#   require 'action_view'
-#   require 'action_view/helpers'
-
-#   include ActionView::Helpers
-# end
-
+using Prestashop::Mapper::Refinement
 module Prestashop
   module Mapper
     class Model
