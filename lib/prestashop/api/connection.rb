@@ -172,7 +172,7 @@ module Prestashop
         temp.close!
         
         if response.success?
-          true # response.body
+          Converter.parse response.body
         else
           raise RequestFailed.new(response), Converter.parse_error(response.body)
         end
