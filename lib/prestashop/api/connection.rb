@@ -1,7 +1,8 @@
 require 'faraday'
-require 'open-uri'
+require 'mini_magick'
 require 'tempfile'
 
+using Prestashop::Api::Refinement
 module Prestashop
   module Api
     class Connection
@@ -84,9 +85,9 @@ module Prestashop
 
         response = connection.get path(opts), params
         if response.success? 
-          Converter.parse response.body
+          response.body.parse
         else
-          raise RequestFailed.new(response), Converter.parse_error(response.body)
+          raise RequestFailed.new(response), response.body.parse_error
         end
       end
 
@@ -100,7 +101,7 @@ module Prestashop
         if response.success?
           true # response.body 
         else
-          raise RequestFailed.new(response), Converter.parse_error(response.body)
+          raise RequestFailed.new(response), response.body.parse_error
         end
       end
 
@@ -113,12 +114,11 @@ module Prestashop
       #   * +:payload+  - posted attachement
       #
       def create options
-        payload = Converter.build(options[:resource], options[:model], options[:payload]) if options[:payload]
-        response = connection.post path(options), payload
+        response = connection.post path(options), payload(options)
         if response.success? 
-          Converter.parse response.body
+          response.body.parse
         else
-          raise RequestFailed.new(response), "#{Converter.parse_error(response.body)}. XML SENT: #{payload}"
+          raise RequestFailed.new(response), "#{response.body.parse_error}. XML SENT: #{payload}"
         end
       end
 
@@ -131,12 +131,11 @@ module Prestashop
       #   * +:payload+  - posted attachement
       #
       def update options
-        payload = Converter.build(options[:resource], options[:model], options[:payload].merge(id: options[:id])) if options[:payload]
-        response = connection.put path(options), payload
+        response = connection.put path(options), payload(options)
         if response.success?
-          Converter.parse response.body
+          response.body.parse
         else
-          raise RequestFailed.new(response), "#{Converter.parse_error(response.body)}. XML SENT: #{payload}"
+          raise RequestFailed.new(response), "#{response.body.parse_error}. XML SENT: #{payload}"
         end
       end
 
@@ -150,7 +149,7 @@ module Prestashop
         if response.success?
           true # response.body
         else
-          raise RequestFailed.new(response), Converter.parse_error(response.body)
+          raise RequestFailed.new(response), response.body.parse_error
         end
       end
 
@@ -161,28 +160,28 @@ module Prestashop
       # opts::
       #   * +file+ - url link to file, which should be uploaded
       def upload options
-        extname = File.extname(options[:file])
-        basename = File.basename(options[:file], extname)
-        temp = Tempfile.new([basename, extname])
-        temp.binmode
-        temp.write open(options[:file]).read
-        sleep(1)
-        payload = { image: Faraday::UploadIO.new(temp.path, 'image') }
+        image = MiniMagick::Image.open(options[:file])
+        payload = { image: Faraday::UploadIO.new(image.path, 'image') }
         response = connection.post upload_path(options), payload
-        temp.close!
+        image.destroy!
         
         if response.success?
-          Converter.parse response.body
+          response.body.parse
         else
-          raise RequestFailed.new(response), Converter.parse_error(response.body)
+          raise RequestFailed.new(response), response.body.parse_error
         end
-      rescue OpenURI::HTTPError => e
-        # File doesn't exist
+      rescue MiniMagick::Invalid
+        # It's not valid image
       end
 
       # Test connection based on current credentials and connection, return true or false, based if request was successfull or not.
       def test
         connection.get.status == 200 ? true : false
+      end
+
+      # Build payload from given options
+      def payload options = {}
+        Converter.build(options[:resource], options[:model], options[:payload].merge(id: options[:id]))
       end
     end
   end
