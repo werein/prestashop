@@ -21,47 +21,49 @@ module Prestashop
         end
 
         it "should head" do
-          stub_request(:head, 'http://123:@localhost.com/api/users')
-          connection.head resource: :users
+          stub_request(:head, 'http://123:@localhost.com/api/products')
+          connection.head :products
         end
 
         it "should delete" do
-          stub_request(:delete, 'http://123:@localhost.com/api/users/1')
-          connection.delete resource: :users, id: 1
+          stub_request(:delete, 'http://123:@localhost.com/api/products/1')
+          connection.delete :products, 1
         end
 
         describe 'with xml expecting' do 
           before { response.expects(:parse) }
 
           it "should get" do
-            stub_request(:get, 'http://123:@localhost.com/api/users').to_return(body: response)
-            connection.get resource: :users
+            stub_request(:get, 'http://123:@localhost.com/api/products').to_return(body: response)
+            connection.get :products
           end
 
           it "should get with id" do
-            stub_request(:get, 'http://123:@localhost.com/api/users/1').to_return(body: response)
-            connection.get resource: :users, id: 1
+            stub_request(:get, 'http://123:@localhost.com/api/products/1').to_return(body: response)
+            connection.get :products, 1
           end
 
           it "should get with multiple ids" do
-            stub_request(:get, 'http://123:@localhost.com/api/users?id=[1,2,3]').to_return(body: response)
-            connection.get resource: :users, id: [1, 2, 3]
+            stub_request(:get, 'http://123:@localhost.com/api/products?id=[1,2,3]').to_return(body: response)
+            connection.get :products, [1, 2, 3]
           end
 
           it "should post" do
-            stub_request(:post, 'http://123:@localhost.com/api/users/1').to_return(body: response)
-            connection.create resource: :users, model: :user, id: 1, payload: { name: 'Steve' }
+            stub_request(:post, 'http://123:@localhost.com/api/products').to_return(body: response)
+            connection.create :products, {}
           end
 
           it "should put" do
-            stub_request(:put, 'http://123:@localhost.com/api/users/1').to_return(body: response)
-            connection.update resource: :users, model: :user, id: 1, payload: { name: 'Steve' }
+            stub_request(:put, 'http://123:@localhost.com/api/products/1').to_return(body: response)
+            connection.update :products, 1, {}
           end
 
-          # it "should upload" do
-          #   stub_request(:post, 'http://123:@localhost.com/api/image/users/1').to_return(body: response)
-          #   connection.upload resource: :users, model: :user, type: :image, id: 1, file: 'steve.jpg'
-          # end
+          it "should upload" do
+            file = mock('file')
+            file.expects(:destroy!)
+            stub_request(:post, 'http://123:@localhost.com/api/images/products/1').to_return(body: response)
+            connection.upload :images, :products, 1, {}, file
+          end
         end
       end
 
@@ -73,8 +75,8 @@ module Prestashop
         end
 
         it "should raise error " do
-          stub_request(:get, 'http://123:@localhost.com/api/users').to_return(status: [400], body: response)
-          ->{ connection.get resource: :users }.must_raise RequestFailed    
+          stub_request(:get, 'http://123:@localhost.com/api/products').to_return(status: [400], body: response)
+          ->{ connection.get :products }.must_raise RequestFailed    
         end
       end
     end

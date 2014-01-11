@@ -44,37 +44,37 @@ module Prestashop
       # Generate path for API request
       #
       # ==== Parameters:
-      # opts [Hash]::
-      #   * +:resource+ [String, Symbol] - Resource of requested item.
-      #   * +:id+       [Integer, Array] - Requested object id or ids.
+      # * +:resource+ [String, Symbol] - Resource of requested item.
+      # * +:id+       [Integer, Array] - Requested object id or ids.
       #
       # ==== Example:
-      #   path(resource: :customers, id: 1) # => customers/1 
+      #   path(:customers, 1) # => "customers/1"
       #
-      def path opts = {}
-        path = opts[:resource].to_s
-        path += opts[:id].kind_of?(Array) ? "?id=[#{opts[:id].join(',')}]" : "/#{opts[:id]}" if opts[:id]
+      def path resource, id = nil
+        path = resource.to_s
+        path += id.kind_of?(Array) ? "?id=[#{id.join(',')}]" : "/#{id}" if id
         path
       end
 
       # Generate path for API upload request
       #
       # ==== Parameters:
-      # opts [Hash]::
-      #   * +:type+       - Type as Image
-      #   * +:resource+   - Resource of requested item
-      #   * +:id+         - Requested object id
+      # * +:type+       - Type as Image
+      # * +:resource+   - Resource of requested item
+      # * +:id+         - Requested object id
       #
-      def upload_path opts = {}
-        "#{opts[:type]}/#{opts[:resource]}/#{opts[:id]}"
+      def upload_path type, resource, id
+        "#{type}/#{resource}/#{id}"
       end
 
       # Call GET on WebService API, returns parsed Prestashop response or raise error, when request failed.
       #
       # ==== Parameters:
-      # * +opts+ - with options for generate path (see #path) and param name, value based on Hash key and value.
+      # * +resource+  - Resource of requested item
+      # * +id+        - ID of requested item, not required
+      # * +opts+      - Param name, value based on Hash key and value.
       #
-      def get opts = {}
+      def get resource, id = nil, opts = {}
         white_list = %w(filter display sort limit schema date)
         params = {}
         opts.each do |name, value|
@@ -83,7 +83,7 @@ module Prestashop
           end
         end 
 
-        response = connection.get path(opts), params
+        response = connection.get path(resource, id), params
         if response.success? 
           response.body.parse
         else
@@ -94,10 +94,11 @@ module Prestashop
       # Call HEAD on WebService API, returns +true+ if was request successfull or raise error, when request failed.
       #
       # ==== Parameters:
-      # * +opts+ - with options for generate path (see #path)
+      # * +resource+  - Resource of requested item
+      # * +id+        - ID of requested item, not required
       #
-      def head options
-        response = connection.head path(options)
+      def head resource, id = nil
+        response = connection.head path(resource, id)
         if response.success?
           true # response.body 
         else
@@ -105,16 +106,14 @@ module Prestashop
         end
       end
 
-      # Call POST on WebService API, eturns parsed Prestashop response if was request successfull or raise error, when request failed.
+      # Call POST on WebService API, returns parsed Prestashop response if was request successfull or raise error, when request failed.
       #
       # ==== Parameters:
-      # * +opts+ - with options for generate path (see #path)
-      # opts::
-      #   * +:model+    - model name, singural or resource
-      #   * +:payload+  - posted attachement
+      # * +:resource+ - Resource of requested item
+      # * +:payload+  - posted attachement
       #
-      def create options
-        response = connection.post path(options), payload(options)
+      def create resource, payload
+        response = connection.post path(resource), payload
         if response.success? 
           response.body.parse
         else
@@ -122,16 +121,15 @@ module Prestashop
         end
       end
 
-      # Call PUT on WebService API, eturns parsed Prestashop response if was request successfull or raise error, when request failed.
+      # Call PUT on WebService API, returns parsed Prestashop response if was request successfull or raise error, when request failed.
       #
       # ==== Parameters:
-      # * +opts+ - with options for generate path (see #path)
-      # opts::
-      #   * +:model+    - model name, singural or resource
-      #   * +:payload+  - posted attachement
+      # * +:resource+ - Resource of requested item
+      # * +:id+       - ID of updated item
+      # * +:payload+  - posted attachement
       #
-      def update options
-        response = connection.put path(options), payload(options)
+      def update resource, id, payload
+        response = connection.put path(resource, id), payload
         if response.success?
           response.body.parse
         else
@@ -142,10 +140,11 @@ module Prestashop
       # Call DELETE on WebService API, returns +true+ if was request successfull or raise error, when request failed.
       #
       # ==== Parameters:
-      # * +opts+ - with options for generate path (see #path)
+      # * +:resource+ - Resource of requested item
+      # * +:id+       - ID of deleted item
       #
-      def delete options
-        response = connection.delete path(options)
+      def delete resource, id
+        response = connection.delete path(resource, id)
         if response.success?
           true # response.body
         else
@@ -153,35 +152,28 @@ module Prestashop
         end
       end
 
-      # Download file from URL and save it to temporary file. After that call POST on WebService API, returns +true+ if was request successfull or raise error, when request failed.
+      # Send file via payload After that call POST on WebService API, returns parsed Prestashop response if was request successfull or raise error, when request failed.
       #
       # ==== Parameters:
-      # * +opts+ - with options for generate path (see #upload_path)
-      # opts::
-      #   * +file+ - url link to file, which should be uploaded
-      def upload options
-        image = MiniMagick::Image.open(options[:file])
-        payload = { image: Faraday::UploadIO.new(image.path, 'image') }
-        response = connection.post upload_path(options), payload
-        image.destroy!
-        
+      # * +type+      - Type (image, attachement)
+      # * +resource+  - Resource of uploaded item
+      # * +id+        - ID of uploaded item
+      # * +payload+   - Attachement in hash with file path
+      # * +file+      - Original file
+      #
+      def upload type, resource, id, payload, file
+        response = connection.post upload_path(type, resource, id), payload
+        file.destroy!
         if response.success?
           response.body.parse
         else
           raise RequestFailed.new(response), response.body.parse_error
         end
-      rescue MiniMagick::Invalid
-        # It's not valid image
       end
 
       # Test connection based on current credentials and connection, return true or false, based if request was successfull or not.
       def test
         connection.get.status == 200 ? true : false
-      end
-
-      # Build payload from given options
-      def payload options = {}
-        Converter.build(options[:resource], options[:model], options[:payload].merge(id: options[:id]))
       end
     end
   end
