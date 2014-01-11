@@ -3,18 +3,8 @@ module Prestashop
   module Mapper
     class Model
       include Crud
+      extend Crud
 
-      def settings; Client.settings; end
-      def self.settings; Client.settings; end
-
-      def create
-        self.class.send(:create, hash)
-      end
-
-      def update id, update
-        self.class.send(:update, id, update)
-      end
-        
       # Meta title is same as name, when is not given
       def meta_title
         @meta_title ? @meta_title.plain.truncate(61) : name

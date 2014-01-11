@@ -189,11 +189,11 @@ module Prestashop
       end
 
       def update id
-        update = {}
-        update[:price] = price if settings.update_price
-        update[:id_tax_rules_group] = id_tax_rules_group if update[:vat]
+        options = {}
+        options[:price] = price if settings.update_price
+        options[:id_tax_rules_group] = id_tax_rules_group if settings.vat_enabled
 
-        product = super id, update
+        product = Product.update(id, options)
 
         if product
           sa = StockAvailable.find_by 'filter[id_product]' => product[:id], 'filter[id_product_attribute]' => 0
