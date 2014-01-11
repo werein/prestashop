@@ -2,8 +2,8 @@ using Prestashop::Mapper::Refinement
 module Prestashop
   module Mapper
     class Model
-      include Crud
-      extend Crud
+      include Extension
+      extend Extension
 
       # Meta title is same as name, when is not given
       def meta_title

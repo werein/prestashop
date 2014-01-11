@@ -1,5 +1,5 @@
 require 'prestashop/mapper/refinement'
-require 'prestashop/mapper/crud'
+require 'prestashop/mapper/extension'
 require 'prestashop/mapper/helper'
 require 'prestashop/mapper/model'
 require 'prestashop/mapper/models'

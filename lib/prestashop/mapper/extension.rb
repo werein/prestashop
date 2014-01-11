@@ -1,6 +1,6 @@
 module Prestashop
   module Mapper
-    module Crud
+    module Extension
       module ClassMethods
         def settings; Client.settings end
 

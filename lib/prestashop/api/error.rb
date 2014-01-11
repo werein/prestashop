@@ -2,7 +2,7 @@ module Prestashop
   module Api
     class InvalidCredentials < RuntimeError #:nodoc:
       def initialize
-        super "Some configuration is invalid" 
+        super "Your credentials are invalid" 
       end
     end
 
