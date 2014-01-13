@@ -51,7 +51,7 @@ module Prestashop
         ProductFeature.resolver @features
       end
 
-      # We call this method more than once, than is good idea to cache it
+      # We call this method more than once, that's good idea to cache it
       def category
         @category ||= Category.resolver(@categories)
       end
@@ -136,9 +136,9 @@ module Prestashop
           available_now:        lang(available_now),
           available_later:      lang(available_later),
           associations: {} }
-        if categories_hash
+        if category[:ids_category]
           product[:associations][:categories] = {}
-          product[:associations][:categories][:category] = categories_hash
+          product[:associations][:categories][:category] = hash_ids(category[:ids_category])
         end
         if features_hash
           product[:associations][:product_features] = {}
@@ -147,24 +147,28 @@ module Prestashop
         product
       end
 
-      # Hash builders
-      def categories_hash
-        category[:ids_category].flatten.uniq.map{|id| category_hash(id)} if category[:ids_category]
-      end
-
-      def category_hash id = nil
+      # Generate hash with ID
+      def hash_id id
         { id: id } if id
       end
 
-      def features_hash
-        id_features.map{|f| feature_hash(f)} if id_features
+      # Make array of unique IDs in hash
+      def hash_ids ids
+        ids.flatten.uniq.map{|id| hash_id(id)} if ids
       end
 
-      def feature_hash hash = nil
+      # Generate hash of single feature
+      def feature_hash hash
         { id: hash[:id_feature],
           id_feature_value: hash[:id_feature_value]
         } if hash
       end
+
+      # Generate hash of features
+      def features_hash
+        id_features.map{|f| feature_hash(f)} if id_features
+      end
+
 
       def create_or_update
         if reference
