@@ -43,15 +43,17 @@ module Prestashop
         @combinations       = args[:combination] || args[:combinations]
       end
 
+      # Get id manufacturer, see #Manufacturer.resolver for params and returns
       def id_manufacturer
-        Manufacturer.resolver @manufacturer
+        @id_manufacturer ||= Manufacturer.resolver(@manufacturer)
       end
 
+      # Get id features, see #ProductFeature.resolver for params and returns
       def id_features
-        ProductFeature.resolver @features
+        @id_features ||= ProductFeature.resolver(@features)
       end
 
-      # We call this method more than once, that's good idea to cache it
+      # Get category, see #Category.resolver for params and returns
       def category
         @category ||= Category.resolver(@categories)
       end
