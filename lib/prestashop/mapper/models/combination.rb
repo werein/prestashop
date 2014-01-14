@@ -36,7 +36,7 @@ module Prestashop
       end
 
       def price
-        original_price ? product_price - Helper.calculate_price(original_price, vat) : 0
+        original_price ? product_price + Helper.calculate_price(original_price, vat) : 0
       end
 
       def hash
@@ -86,7 +86,7 @@ module Prestashop
           available_date: available_date
         }
 
-        combination = super id, update
+        combination = Combination.update(id, update)
         if settings.update_stock
           sa = StockAvailable.find_by 'filter[id_product]' => id_product, 'filter[id_product_attribute]' => combination[:id]
           StockAvailable.update(sa, quantity: quantity)
