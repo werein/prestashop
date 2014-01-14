@@ -61,7 +61,7 @@ module Prestashop
       end
 
       def description
-        @description.html if @description
+        @description.html(settings.html_enabled?) if @description
       end
 
       def description_short
