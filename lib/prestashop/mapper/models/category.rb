@@ -83,7 +83,7 @@ module Prestashop
         # Create new category based on given param, delimited by delimiter in settings
         #
         # ==== Example:
-        #   Category.create_from_name('Apple|iPhone') # => [1, 2]
+        #   Category.create_from_name('Apple||iPhone') # => [1, 2]
         #
         def create_from_name category_name
           if category_name and !category_name.empty?
@@ -98,7 +98,20 @@ module Prestashop
           end
         end
 
-        # Create categories, from string, hash or array
+        # Create categories, from string, hash or array.
+        #
+        # It takes [String], [Array] or [Hash] +:default+ +:secondary+
+        #
+        # ==== Returns:
+        # Hash:
+        #   * +:id_category_default+  - ID of default category
+        #   * +:ids_category+         - Array of secondary categories
+        #
+        # ==== Example:
+        #   Category.resolver 'Apple||iPhone' # => { id_category_default: 10, ids_category: [2, 10] }
+        #   Category.resolver ['Apple||iPhone||Accessories', 'Apple||Accessories'] # => { id_category_default: 15, ids_category: [12, 10, 2, 15] }
+        #   Category.resolver default: 'Apple||Accessories', secondary: 'Apple||iPhone||Accessories' # => { id_category_default: 15, ids_category: [12, 10, 2, 15] }
+        #
         def resolver resource
           case [resource.class]
           when [String]
@@ -114,14 +127,16 @@ module Prestashop
             if resource[:default]
               categories = create_from_name resource[:default]
               default_category = categories.last if categories
-              if resource[:secondary]
+              if resource[:secondary].kind_of?(Array)
                 resource[:secondary].each do |secondary|
                   categories << create_from_name(secondary)
                 end
+              else
+                categories << create_from_name(resource[:secondary])
               end
             end    
           end
-          { id_category_default: default_category, ids_category: categories }
+          { id_category_default: default_category, ids_category: categories.flatten.uniq }
         end
       end
     end

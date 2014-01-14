@@ -59,6 +59,38 @@ module Prestashop
         cat.expects(:find_or_create).once
         Category.create_from_name 'Apple'
       end
+
+      it "should generate correct hash from string" do
+        cat_name = 'Apple||iPhone'
+        Category.stubs(:create_from_name).with(cat_name).returns([1,2])
+        Category.resolver(cat_name).must_equal({id_category_default: 2, ids_category: [1,2]})
+      end
+
+      it "should generate correct hash from array" do 
+        cat_name = 'Apple||iPhone||Accessories'
+        cat_name2 = 'Apple||Accessories'
+        Category.stubs(:create_from_name).with(cat_name).returns([1,2,3])
+        Category.stubs(:create_from_name).with(cat_name2).returns([1,4])
+        Category.resolver([cat_name, cat_name2]).must_equal({id_category_default: 4, ids_category: [1,2,3,4]})
+      end
+
+      it "should generate correct hash from hash" do 
+        cat_name = 'Apple||iPhone||Accessories'
+        cat_name2 = 'Apple||Accessories'
+        Category.stubs(:create_from_name).with(cat_name).returns([1,2,3])
+        Category.stubs(:create_from_name).with(cat_name2).returns([1,4])
+        Category.resolver(default: cat_name, secondary: cat_name2).must_equal({id_category_default: 3, ids_category: [1,2,3,4]})
+      end
+
+      it "should generate correct hash from hash and array" do 
+        cat_name = 'Apple||iPhone||Accessories'
+        cat_name2 = 'Apple||Accessories'
+        cat_name3 = 'Apple||Car'
+        Category.stubs(:create_from_name).with(cat_name).returns([1,2,3])
+        Category.stubs(:create_from_name).with(cat_name2).returns([1,4])
+        Category.stubs(:create_from_name).with(cat_name3).returns([1,5])
+        Category.resolver(default: cat_name, secondary: [cat_name2, cat_name3]).must_equal({id_category_default: 3, ids_category: [1,2,3,4,5]})
+      end
     end 
   end
 end
