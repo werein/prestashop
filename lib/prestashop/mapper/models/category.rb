@@ -51,7 +51,7 @@ module Prestashop
 
       # Find category by name and id parent, create new one from hash, when doesn't exist
       def find_or_create
-        category = Category.find_in_cache name: name, id_parent: id_parent
+        category = Category.find_in_cache name, id_parent
         unless category
           category = create
           settings.clear_categories_cache
@@ -64,14 +64,9 @@ module Prestashop
         # Search for category based on args on cached categories, see #cache and #Client::Settings.categories_cache
         # Returns founded category or nil
         #
-        # ==== Parameters:
-        # opts [Hash]:
-        #   * +:id_parent+  - Parent category
-        #   * +:name+       - Name of category
-        #
-        def find_in_cache args = {}
+        def find_in_cache name, id_parent
           found = settings.categories_cache.find do |c| 
-            c[:id_parent][:val] == args[:id_parent] and c[:name].lang_search(args[:name]) unless c[:id_parent] == 0
+            c[:id_parent][:val] == id_parent and c[:name].lang_search(name)
           end
         end
 

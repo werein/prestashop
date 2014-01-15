@@ -43,8 +43,8 @@ module Prestashop
         name.expects(:lang_search).returns(true)
         cache = [{id_parent: {val: 1}, name: name }]
         @settings.stubs(:categories_cache).returns(cache)
-        Category.find_in_cache(id_parent: 1, name: 'Apple').must_equal cache.first
-        Category.find_in_cache(id_parent: 2, name: 'Apple').must_equal nil
+        Category.find_in_cache('Apple', 1).must_equal cache.first
+        Category.find_in_cache('Apple', 2).must_equal nil
       end
 
       it "should cache by calling all" do 
