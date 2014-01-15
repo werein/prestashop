@@ -97,7 +97,7 @@ module Prestashop
               if current_combinations
                 current_combinations.map{|id| combination.update(id)} if Client.update_enabled
               else
-                combination.image_ids = Image.new(resource: 'products', resource_id: id_product, source: res[:images])
+                combination.image_ids = Image.new(resource: 'products', resource_id: id_product, source: res[:images]).upload
                 combination.create
               end
             end
