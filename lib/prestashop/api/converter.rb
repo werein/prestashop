@@ -96,9 +96,13 @@ module Prestashop
         if node.element?
           result_hash = {}
           if node.attributes != {}
-            result_hash[:attr] = {}
-            node.attributes.each do |key, value|
-              result_hash[:attr][value.name.to_sym] = prepare(value.value)
+             if node.attributes
+              node.attributes.each do |key, value|
+                unless value.name == 'href'
+                  result_hash[:attr] = {} unless result_hash[:attr]
+                  result_hash[:attr][value.name.to_sym] = prepare(value.value)
+                end
+              end
             end
           end
           if node.children.size > 0
