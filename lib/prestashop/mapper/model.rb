@@ -24,6 +24,10 @@ module Prestashop
         { language: { val: value, attr: { id: settings.id_language }}} if value
       end
 
+      def lang_hash value, id_lang
+        { language: { val: value, attr: { id: id_lang }}} if value
+      end
+
       class << self
         def resource value = nil
           value.nil? ? @resource : @resource = value
