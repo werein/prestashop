@@ -67,6 +67,22 @@ module Prestashop
         "#{type}/#{resource}/#{id}"
       end
 
+      # Call HEAD on WebService API, returns +true+ if was request successfull or raise error, when request failed.
+      #
+      # ==== Parameters:
+      # * +resource+  - Resource of requested item
+      # * +id+        - ID of requested item, not required
+      #
+      def head resource, id = nil
+        response = connection.head path(resource, id)
+        if response.success?
+          true # response.body 
+        else
+          raise RequestFailed.new(response), response.body.parse_error
+        end
+      end
+      alias :check :head
+
       # Call GET on WebService API, returns parsed Prestashop response or raise error, when request failed.
       #
       # ==== Parameters:
@@ -90,21 +106,7 @@ module Prestashop
           raise RequestFailed.new(response), response.body.parse_error
         end
       end
-
-      # Call HEAD on WebService API, returns +true+ if was request successfull or raise error, when request failed.
-      #
-      # ==== Parameters:
-      # * +resource+  - Resource of requested item
-      # * +id+        - ID of requested item, not required
-      #
-      def head resource, id = nil
-        response = connection.head path(resource, id)
-        if response.success?
-          true # response.body 
-        else
-          raise RequestFailed.new(response), response.body.parse_error
-        end
-      end
+      alias :read :get
 
       # Call POST on WebService API, returns parsed Prestashop response if was request successfull or raise error, when request failed.
       #
@@ -112,7 +114,7 @@ module Prestashop
       # * +:resource+ - Resource of requested item
       # * +:payload+  - posted attachement
       #
-      def create resource, payload
+      def post resource, payload
         response = connection.post path(resource), payload
         if response.success? 
           response.body.parse
@@ -120,6 +122,7 @@ module Prestashop
           raise RequestFailed.new(response), "#{response.body.parse_error}. XML SENT: #{payload}"
         end
       end
+      alias :create :post
 
       # Call PUT on WebService API, returns parsed Prestashop response if was request successfull or raise error, when request failed.
       #
@@ -128,7 +131,7 @@ module Prestashop
       # * +:id+       - ID of updated item
       # * +:payload+  - posted attachement
       #
-      def update resource, id, payload
+      def put resource, id, payload
         response = connection.put path(resource, id), payload
         if response.success?
           response.body.parse
@@ -136,6 +139,7 @@ module Prestashop
           raise RequestFailed.new(response), "#{response.body.parse_error}. XML SENT: #{payload}"
         end
       end
+      alias :update :put
 
       # Call DELETE on WebService API, returns +true+ if was request successfull or raise error, when request failed.
       #
