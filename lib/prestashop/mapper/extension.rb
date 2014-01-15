@@ -4,24 +4,46 @@ module Prestashop
       module ClassMethods
         def settings; Client.settings end
 
-        # Return true or false, if product exist or not
+        # Determinate if model with class resource exists with given id
+        #
+        # === Example:
+        #   Car.exists?(1) # => true # if given car exist
+        #   Car.exists?(2) # => false # if given car don't exist
+        #
         def exists? id
           Client.connection.head self.resource, id
         end
 
-        # Find by id, returns hash with params
+        # Find model by class resource and given id, returns hash
+        # with all nodes, based on node name as key, node value as value
+        #
+        # === Example:
+        #   Car.find(1) # => { id: 1, name: 'BMW' }
+        #   Car.find(2) # => nil
+        #
         def find id
           result = Client.connection.get self.resource, id
           result ? result[self.model] : nil
         end
 
-        # Find only one item, returns id
+        # Find model by class resource and params in hash
+        # Returns first result, see #where for more informations
+        #
+        # === Example:
+        #   Car.find_by(name: 'BMW') # => 1
+        #
         def find_by options = {}
           results = where(options)
           results ? results.first : nil
         end
 
-        # Return hash of all resources
+        # Get models all results by class resource, you can specifi what
+        # you should to see as result by specifiyng +:display+
+        #
+        # === Example:
+        #   Car.all # => [1,2,3]
+        #   Car.all(display: ['name']) # => [{ name: { language: { attr: { id: 2, href: 'http://localhost.com/api/languages/2'}, val: 'BMW 7'} }]
+        #
         def all options = {}
           result = if options[:display] 
             Client.connection.get self.resource, nil, display: options[:display]
@@ -31,28 +53,53 @@ module Prestashop
           handle_result result, options
         end
         
-        # Find by conditionals, returns array of ids or nil
+        # Get results by class resource and given conditionals
+        #
+        # === Example:
+        #   Car.where('filter[id_supplier' => 1) # => [1, 2]
         def where options = {}
           result = Client.connection.get self.resource, nil, options
           handle_result result, options
         end
 
-        # Destroy with given id
+        # Destroy model by class resource and given id
+        #
+        # === Example:
+        #   Car.destroy(1) # => true
+        #
         def destroy id
           Client.connection.delete self.resource, id
         end
 
-        # Update resource and return new informations
+        # Create hash suitable for update, contains #fixed_hash as hash with deleted
+        # keys, which shouldn't be in payload, if exist
+        #
+        # === Example:
+        #   Car.update_hash(1, name: 'BMW7') # => {name: 'BMW7', manufacturer: 'BMW'}
+        #
+        def update_hash id, options
+          original = defined?(fixed_hash(nil)) ? fixed_hash(id) : find(id)
+          original.merge(options)
+        end
+
+        # Create payload for update, converts hash to XML
+        #
+        # === Example:
+        #   Car.update_payload(1, name: 'BMW 7') # => <prestashop xmlns:xlink="http://www.w3.org/1999/xlink"><car><name><![CDATA[BMW 7]]></name></car></prestashop>
+        #
+        def update_payload id, options
+          Api::Converter.build(self.resource, self.model, update_hash(id, options))
+        end
+
+        # Update model, with class resource by +id+ and given updates
+        #
+        # === Example:
+        #   Car.update(1, name: 'BMW 7') # => {id: 1, name: 'BMW 7'}
+        #
         def update id, options = {}
           result = Client.connection.update self.resource, id, update_payload(id, options)
           result ? result[self.model] : nil
         end 
-
-        def update_payload id, options
-          original = defined?(fixed_hash(nil)) ? fixed_hash(id) : find(id)
-          final = original.merge(options)
-          Api::Converter.build(self.resource, self.model, final)
-        end
 
         private
           def handle_result result, options = {}
@@ -75,14 +122,41 @@ module Prestashop
       module InstanceMethods
         def settings; Client.settings end
 
-        # Create new resource, returns created resource, when passed or false when failed
+        # Generate hash with ID
+        #
+        # === Example:
+        #   car.hash_id(1) # => {id: 1}
+        #
+        def hash_id id
+          { id: id } if id
+        end
+
+        # Make array of unique IDs in hash
+        #
+        # === Example:
+        #   car.hash_ids(1,2,3) # => [{id: 1},{id: 2},{id: 3}]
+        # 
+        def hash_ids ids
+          ids.flatten.uniq.map{|id| hash_id(id)} if ids
+        end
+
+        # Create payload for create new object, coverts hash to XML
+        #
+        # === Example:
+        #   car.payload # => '<prestashop xmlns:xlink="http://www.w3.org/1999/xlink"><car><name><![CDATA[BMW 7]]></name><manufacturer><![CDATA[BMW]]></manufacturer></car></prestashop>'
+        #
+        def payload
+          Api::Converter.build(self.class.resource, self.class.model, hash)
+        end
+
+        # Create new model from instance, based on class resource a payload generated from
+        # hash method
+        # 
+        # === Example:
+        #   Car.new(name: 'BMW 7', manufacturer: 'BMW').create # => { id: 1, name: 'BMW 7', manufacturer: 'BMW' }
         def create
           result = Client.connection.create self.class.resource, payload
           result ? result[self.class.model] : nil
-        end
-
-        def payload
-          Api::Converter.build(self.class.resource, self.class.model, hash)
         end
       end
       

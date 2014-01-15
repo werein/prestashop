@@ -51,27 +51,15 @@ module Prestashop
           quantity:           quantity,
           associations: {}
         }
-        combination[:associations][:product_option_values] = {}
-        combination[:associations][:product_option_values][:product_option_value] = options_hash
-        combination[:associations][:images] = {}
-        combination[:associations][:images][:image] = images_hash
+        if value_ids
+          combination[:associations][:product_option_values] = {}
+          combination[:associations][:product_option_values][:product_option_value] = hash_ids(value_ids)
+        end
+        if image_ids
+          combination[:associations][:images] = {}
+          combination[:associations][:images][:image] = hash_ids(image_ids)
+        end
         combination
-      end
-
-      def option_hash id = nil
-        { id: id } if id
-      end
-
-      def options_hash
-        value_ids.map{|o| option_hash(o)} if value_ids
-      end
-
-      def image_hash id = nil
-        { id: id } if id
-      end
-
-      def images_hash
-        image_ids.map{|o| image_hash(o)} if image_ids
       end
 
       def create 
@@ -95,10 +83,6 @@ module Prestashop
       end
 
       class << self
-        def product id_product
-          where 'filter[id_product]' => id_product, display: '[id_product,reference]'
-        end
-
         def resolve id_product, resource, product_price
           if resource.kind_of?(Array)
             resource.each_with_index do |res, index|

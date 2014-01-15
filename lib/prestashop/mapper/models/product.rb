@@ -149,16 +149,6 @@ module Prestashop
         product
       end
 
-      # Generate hash with ID
-      def hash_id id
-        { id: id } if id
-      end
-
-      # Make array of unique IDs in hash
-      def hash_ids ids
-        ids.flatten.uniq.map{|id| hash_id(id)} if ids
-      end
-
       # Generate hash of single feature
       def feature_hash hash
         { id: hash[:id_feature],
@@ -171,15 +161,12 @@ module Prestashop
         id_features.map{|f| feature_hash(f)} if id_features
       end
 
-
       def create_or_update
-        if reference
-          current_products = Product.where 'filter[reference]' => reference, 'filter[id_supplier]' => id_supplier
-          if current_products 
-            current_products.map{|id| update(id)} if settings.update_enabled
-          else
-            create if settings.import_enabled
-          end
+        current_products = Product.where 'filter[reference]' => reference, 'filter[id_supplier]' => id_supplier
+        if current_products 
+          current_products.map{|id| update(id)} if settings.update_enabled
+        else
+          create if settings.import_enabled
         end
       end
 
