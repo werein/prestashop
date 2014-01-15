@@ -2,7 +2,7 @@ module Prestashop
   module Mapper
     module Extension
       module ClassMethods
-        def settings; Client.settings end
+        def settings; Client end
 
         # Determinate if model with class resource exists with given id
         #
@@ -11,7 +11,7 @@ module Prestashop
         #   Car.exists?(2) # => false # if given car don't exist
         #
         def exists? id
-          Client.connection.head self.resource, id
+          Client.check self.resource, id
         end
 
         # Find model by class resource and given id, returns hash
@@ -22,7 +22,7 @@ module Prestashop
         #   Car.find(2) # => nil
         #
         def find id
-          result = Client.connection.get self.resource, id
+          result = Client.read self.resource, id
           result ? result[self.model] : nil
         end
 
@@ -46,9 +46,9 @@ module Prestashop
         #
         def all options = {}
           result = if options[:display] 
-            Client.connection.get self.resource, nil, display: options[:display]
+            Client.read self.resource, nil, display: options[:display]
           else
-            Client.connection.get self.resource
+            Client.read self.resource
           end
           handle_result result, options
         end
@@ -58,7 +58,7 @@ module Prestashop
         # === Example:
         #   Car.where('filter[id_supplier' => 1) # => [1, 2]
         def where options = {}
-          result = Client.connection.get self.resource, nil, options
+          result = Client.read self.resource, nil, options
           handle_result result, options
         end
 
@@ -68,7 +68,7 @@ module Prestashop
         #   Car.destroy(1) # => true
         #
         def destroy id
-          Client.connection.delete self.resource, id
+          Client.delete self.resource, id
         end
 
         # Create hash suitable for update, contains #fixed_hash as hash with deleted
@@ -97,7 +97,7 @@ module Prestashop
         #   Car.update(1, name: 'BMW 7') # => {id: 1, name: 'BMW 7'}
         #
         def update id, options = {}
-          result = Client.connection.update self.resource, id, update_payload(id, options)
+          result = Client.update self.resource, id, update_payload(id, options)
           result ? result[self.model] : nil
         end 
 
@@ -120,7 +120,7 @@ module Prestashop
       end
       
       module InstanceMethods
-        def settings; Client.settings end
+        def settings; Client end
 
         # Generate hash with ID
         #
@@ -155,7 +155,7 @@ module Prestashop
         # === Example:
         #   Car.new(name: 'BMW 7', manufacturer: 'BMW').create # => { id: 1, name: 'BMW 7', manufacturer: 'BMW' }
         def create
-          result = Client.connection.create self.class.resource, payload
+          result = Client.create self.class.resource, payload
           result ? result[self.class.model] : nil
         end
       end
