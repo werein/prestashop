@@ -40,7 +40,11 @@ module Prestashop
         Client.expects(:upload)
         MiniMagick::Image.stubs(:open).returns(file)
         image.stubs(:payload).returns({})
-        image.uploader('/image/first.png')
+        image.uploader('http://locahost.com/image/first.png')
+      end
+
+      it "should not take invalid url" do 
+        image.uploader('/image/first.com').must_equal false
       end
     end 
   end

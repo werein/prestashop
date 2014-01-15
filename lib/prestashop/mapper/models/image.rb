@@ -1,3 +1,5 @@
+require 'open-uri'
+
 using Prestashop::Mapper::Refinement
 module Prestashop
   module Mapper
@@ -26,11 +28,15 @@ module Prestashop
       end
 
       def uploader source
-        self.file = MiniMagick::Image.open(source)
-        result = Client.upload 'images', resource, resource_id, payload, file
-        result[:image][:id] if result
+        if source =~ URI::regexp
+          self.file = MiniMagick::Image.open(source)
+          result = Client.upload 'images', resource, resource_id, payload, file
+          result[:image][:id] if result
+        else
+          false # Not valid url
+        end
       rescue MiniMagick::Invalid
-        nil # It's not valid image
+        false # It's not valid image
       end
 
       def payload
