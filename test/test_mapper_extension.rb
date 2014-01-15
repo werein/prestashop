@@ -72,11 +72,11 @@ module Prestashop
         EOT
 
         result = [ { 
-            id_supplier: { attr: { href: 'http://dev.demo.storio.cz/api/suppliers/1'}, val: 1 }, 
-            name: { language: { attr: { id: 2, href: 'http://localhost.com/api/languages/2'}, val: 'BMW 7'}}
+            id_supplier: 1, 
+            name: { language: { attr: { id: 2 }, val: 'BMW 7'}}
           }, { 
-            id_supplier: { attr: { href: 'http://dev.demo.storio.cz/api/suppliers/1'}, val: 1}, 
-            name: { language: { attr: { id: 2, href: 'http://localhost.com/api/languages/2'}, val: 'BMW 5'}}
+            id_supplier: 1, 
+            name: { language: { attr: { id: 2 }, val: 'BMW 5'}}
           }
         ]
 

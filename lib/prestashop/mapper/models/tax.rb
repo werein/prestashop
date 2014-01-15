@@ -11,7 +11,7 @@ module Prestashop
 
           taxes = {}
           tax_rules.each do |value|
-            taxes[find(value[:id_tax])[:rate].to_i.to_s] = value[:id_tax_rules_group][:val]
+            taxes[find(value[:id_tax])[:rate].to_i.to_s] = value[:id_tax_rules_group]
           end
           taxes
         end

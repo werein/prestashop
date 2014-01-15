@@ -5,30 +5,36 @@ module Prestashop
       resource :images
       model :image
 
-      class << self
-        def upload options = {}
-          if options[:file].kind_of? Array
-            images = []
-            options[:file].each do |file|
-              images << uploader(options[:resource], options[:id], file)
-            end
-            images.map{|i| i[:image][:id] } unless images.empty?
-          else
-            image = uploader(options[:resource], options[:id], options[:file])
-            image[:image][:id] if image
-          end if options[:file]
-        end
+      attr_accessor :resource, :resource_id, :source, :file
 
-        def uploader resource, id, source
-          file = MiniMagick::Image.open(source)
-          Client.current.connection.upload 'images', resource, id, payload(file), file
-        rescue MiniMagick::Invalid
-          nil # It's not valid image
-        end
+      def initialize args = {}
+        @resource    = args.fetch(:resource)
+        @resource_id = args.fetch(:resource_id)
+        @source      = args.fetch(:source)
+      end
 
-        def payload file
-          { image: Faraday::UploadIO.new(file.path, 'image') }
-        end
+      def images
+        source.kind_of?(Array) ? source : [source]
+      end
+
+      def upload
+        result = []
+        images.each do |image|
+          result << uploader(image)
+        end unless images.empty?
+        result
+      end
+
+      def uploader source
+        self.file = MiniMagick::Image.open(source)
+        result = Client.upload 'images', resource, resource_id, payload, file
+        result[:image][:id] if result
+      rescue MiniMagick::Invalid
+        nil # It's not valid image
+      end
+
+      def payload
+        { image: Faraday::UploadIO.new(file.path, 'image') }
       end
     end
   end

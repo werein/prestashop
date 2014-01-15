@@ -16,13 +16,13 @@ module Prestashop
 
       def hash
         validate!
-        { name:               lang_hash(name, id_lang),
+        { name:               hash_lang(name, id_lang),
           id_attribute_group: id_attribute_group,
           color:              color }
       end
 
       def find_or_create
-        result = self.class.find_in_cache id_attribute_group, name
+        result = self.class.find_in_cache id_attribute_group, name, id_lang
         unless result
           result = create
           Client.clear_option_values_cache
@@ -39,8 +39,8 @@ module Prestashop
       end
 
       class << self
-        def find_in_cache id_attribute_group, name
-          Client.option_values_cache.find{|v| v[:id_attribute_group][:val] == id_attribute_group and v[:name].find_lang(name, id_lang)} if Client.option_values_cache
+        def find_in_cache id_attribute_group, name, id_lang
+          Client.option_values_cache.find{|v| v[:id_attribute_group] == id_attribute_group and v[:name].find_lang(name, id_lang)} if Client.option_values_cache
         end
 
         def cache

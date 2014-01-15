@@ -15,7 +15,7 @@ module Prestashop
         @upc              = args[:upc]
         @quantity         = args.fetch(:quantity, 0)
         @reference        = args.fetch(:reference)
-        @supplier_reference = settings.supplier
+        @supplier_reference = Client.supplier
         @wholesale_price  = args[:wholesale_price]
         @original_price   = args.fetch(:price)
         @product_price    = args.fetch(:product_price)
@@ -75,7 +75,7 @@ module Prestashop
         }
 
         combination = Combination.update(id, update)
-        if settings.update_stock
+        if Client.update_stock
           sa = StockAvailable.find_by 'filter[id_product]' => id_product, 'filter[id_product_attribute]' => combination[:id]
           StockAvailable.update(sa, quantity: quantity)
         end
@@ -95,9 +95,9 @@ module Prestashop
               combination = Combination.new(id_product: id_product, reference: res[:reference], price: res[:price], product_price: product_price, quantity: res[:quantity], default_on: default_on, value_ids: value_ids)
               current_combinations = where 'filter[id_product]' => id_product, 'filter[reference]' => res[:reference]
               if current_combinations
-                current_combinations.map{|id| combination.update(id)} if settings.update_enabled
+                current_combinations.map{|id| combination.update(id)} if Client.update_enabled
               else
-                combination.image_ids = Image.upload(resource: :products, id: id_product, file: res[:images])
+                combination.image_ids = Image.new(resource: 'products', resource_id: id_product, source: res[:images])
                 combination.create
               end
             end
@@ -105,10 +105,10 @@ module Prestashop
         end
 
         def deactivate
-          if settings.deactivate and settings.update_enabled
+          if Client.deactivate and Client.update_enabled
             first = (Date.today-365).strftime("%F")
             last = (Date.today-1).strftime("%F")
-            combinations = where 'filter[date_upd]' => "[#{first},#{last}]", date: 1, 'filter[supplier_reference]' => settings.supplier, limit: 1000
+            combinations = where 'filter[date_upd]' => "[#{first},#{last}]", date: 1, 'filter[supplier_reference]' => Client.supplier, limit: 1000
             if combinations and !combinations.empty?
               combinations.map{|c| delete(c)}
             end

@@ -5,12 +5,10 @@ module Prestashop
     describe Product do
       let(:product) { Product.new(attributes_for(:product)) }
       before do
-        @settings =  mock 'settings'
-        @settings.stubs(:id_supplier).returns(1)
-        @settings.stubs(:available_now).returns('Available now')
-        @settings.stubs(:available_later).returns('Available later')
-        Product.stubs(:settings).returns(@settings)
-        Product.any_instance.stubs(:settings).returns(@settings)
+        Client.stubs(:id_language).returns(2)
+        Client.stubs(:id_supplier).returns(1)
+        Client.stubs(:available_now).returns('Available now')
+        Client.stubs(:available_later).returns('Available later')
       end
   
       it "should make hash of id" do

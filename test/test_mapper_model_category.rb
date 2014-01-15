@@ -5,9 +5,7 @@ module Prestashop
     describe Category do
       let(:category) { Category.new(attributes_for(:category)) }
       before do
-        @settings =  mock 'settings'
-        Category.stubs(:settings).returns(@settings)
-        Category.any_instance.stubs(:settings).returns(@settings)
+        Client.stubs(:id_language).returns(2)
       end
 
       it "should have valid name" do 
@@ -34,17 +32,15 @@ module Prestashop
       it "should create new one, when is not find in cache" do 
         Category.expects(:find_in_cache).returns(false)
         Category.any_instance.expects(:create).returns({id: 1})
-        @settings.expects(:clear_categories_cache)
+        Client.expects(:clear_categories_cache)
         category.find_or_create.must_equal 1
       end
 
       it "should look for category in cache" do
-        name = mock 'name'
-        name.expects(:lang_search).returns(true)
-        cache = [{id_parent: {val: 1}, name: name }]
-        @settings.stubs(:categories_cache).returns(cache)
-        Category.find_in_cache('Apple', 1).must_equal cache.first
-        Category.find_in_cache('Apple', 2).must_equal nil
+        cache = [{ id_parent: 1, name: { language: { val: 'Apple',  attr: { id: 2 }}}} ]
+        Client.stubs(:categories_cache).returns(cache)
+        Category.find_in_cache(1, 'Apple', 2).must_equal cache.first
+        Category.find_in_cache(2, 'Apple', 2).must_equal nil
       end
 
       it "should cache by calling all" do 
@@ -54,7 +50,7 @@ module Prestashop
 
       it "should create from name" do
         cat = mock('category')
-        @settings.stubs(:delimiter).returns('|')
+        Client.stubs(:delimiter).returns('|')
         Category.expects(:new).returns(cat)
         cat.expects(:find_or_create).once
         Category.create_from_name 'Apple'

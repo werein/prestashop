@@ -5,12 +5,13 @@ module Prestashop
       resource :products
       model    :product
 
-      attr_reader :id_shop_default, :id_supplier, :vat, :on_sale, :online_only, :ean, :upc, :ecotax, :minimal_quantity, 
+      attr_reader :id_lang, :id_shop_default, :id_supplier, :vat, :on_sale, :online_only, :ean, :upc, :ecotax, :minimal_quantity, 
                   :original_price, :wholesale_price, :out_of_stock, :condition, :quantity, :categories, :images, :manufacturer, :features, :combinations
 
       def initialize args = {}
+        @id_lang            = args.fetch(:id_lang, Client.id_language)
         @id_shop_default    = 1
-        @id_supplier        = settings.id_supplier
+        @id_supplier        = Client.id_supplier
         
         @name               = args.fetch(:name)
         @description        = args[:description]
@@ -32,8 +33,8 @@ module Prestashop
         @reference          = args[:reference]
         @out_of_stock       = 2
         @condition          = args.fetch(:condition, 'new')
-        @available_now      = args.fetch(:available_now, settings.available_now)
-        @available_later    = args.fetch(:available_later, settings.available_later)
+        @available_now      = args.fetch(:available_now, Client.available_now)
+        @available_later    = args.fetch(:available_later, Client.available_later)
         
         # Dependencies
         @categories         = args[:category] || args[:categories]
@@ -63,7 +64,7 @@ module Prestashop
       end
 
       def description
-        @description.html(settings.html_enabled) if @description
+        @description.html(Client.html_enabled) if @description
       end
 
       def description_short
@@ -75,7 +76,7 @@ module Prestashop
       end
 
       def id_tax_rules_group
-        settings.taxes[vat.to_s]
+        Client.taxes[vat.to_s]
       end
 
       def price
@@ -87,23 +88,23 @@ module Prestashop
       end
 
       def active
-        settings.product_active ? 1 : 0
+        Client.product_active ? 1 : 0
       end
 
       def available_for_order
-        settings.product_available_for_order ? 1 : 0
+        Client.product_available_for_order ? 1 : 0
       end
 
       def show_price
-        settings.product_show_price ? 1 : 0
+        Client.product_show_price ? 1 : 0
       end
 
       def available_now
-        @available_now ? @available_now.plain.truncate(125) : settings.available_now
+        @available_now ? @available_now.plain.truncate(125) : Client.available_now
       end
 
       def available_later
-        @available_later ? @available_later.plain.truncate(125) : settings.available_later
+        @available_later ? @available_later.plain.truncate(125) : Client.available_later
       end
 
       def hash
@@ -128,15 +129,15 @@ module Prestashop
           available_for_order:  available_for_order,
           condition:            condition,
           show_price:           show_price,
-          name:                 lang(name),
-          description:          lang(description),
-          description_short:    lang(description_short),
-          link_rewrite:         lang(link_rewrite),
-          meta_title:           lang(meta_title),
-          meta_description:     lang(meta_description),
-          meta_keywords:        lang(meta_keywords),
-          available_now:        lang(available_now),
-          available_later:      lang(available_later),
+          name:                 hash_lang(name, id_lang),
+          description:          hash_lang(description, id_lang),
+          description_short:    hash_lang(description_short, id_lang),
+          link_rewrite:         hash_lang(link_rewrite, id_lang),
+          meta_title:           hash_lang(meta_title, id_lang),
+          meta_description:     hash_lang(meta_description, id_lang),
+          meta_keywords:        hash_lang(meta_keywords, id_lang),
+          available_now:        hash_lang(available_now, id_lang),
+          available_later:      hash_lang(available_later, id_lang),
           associations: {} }
         if category[:ids_category]
           product[:associations][:categories] = {}
@@ -162,11 +163,11 @@ module Prestashop
       end
 
       def create_or_update
-        current_products = Product.where 'filter[reference]' => reference, 'filter[id_supplier]' => id_supplier
+        current_products = self.class.where 'filter[reference]' => reference, 'filter[id_supplier]' => id_supplier
         if current_products 
-          current_products.map{|id| update(id)} if settings.update_enabled
+          current_products.map{|id| update(id)} if Client.update_enabled
         else
-          create if settings.import_enabled
+          create if Client.import_enabled
         end
       end
 
@@ -175,7 +176,7 @@ module Prestashop
         if product
           sa = product[:associations][:stock_availables][:stock_available][:id]
           StockAvailable.update(sa, { quantity: quantity }) if quantity
-          Image.upload(resource: :products, id: product[:id], file: images) if images
+          Image.new(resource: 'products', resource_id: product[:id], source: images).upload
           Combination.resolve product[:id], combinations, price if combinations
         end
         product
@@ -183,15 +184,15 @@ module Prestashop
 
       def update id
         options = {}
-        options[:price] = price if settings.update_price
-        options[:id_tax_rules_group] = id_tax_rules_group if settings.vat_enabled
+        options[:price] = price if Client.update_price
+        options[:id_tax_rules_group] = id_tax_rules_group if Client.vat_enabled
 
-        product = Product.update(id, options)
+        product = self.class.update(id, options)
 
         if product
           sa = StockAvailable.find_by 'filter[id_product]' => product[:id], 'filter[id_product_attribute]' => 0
-          StockAvailable.update(sa, quantity: quantity, id_shop: id_shop_default) if settings.update_stock
-          Combination.resolve product[:id], combinations, price if combinations and settings.update_enabled
+          StockAvailable.update(sa, quantity: quantity, id_shop: id_shop_default) if Client.update_stock
+          Combination.resolve product[:id], combinations, price if combinations and Client.update_enabled
         end
         product
       end
@@ -208,10 +209,10 @@ module Prestashop
         end
 
         def deactivate
-          if settings.deactivate and settings.update_enabled
+          if Client.deactivate and Client.update_enabled
             first = (Date.today-365).strftime("%F")
             last = (Date.today-1).strftime("%F")
-            products = where 'filter[date_upd]' => "[#{first},#{last}]", date: 1, 'filter[id_supplier]' => settings.id_supplier, 'filter[active]' => 1, limit: 1000
+            products = where 'filter[date_upd]' => "[#{first},#{last}]", date: 1, 'filter[id_supplier]' => Client.id_supplier, 'filter[active]' => 1, limit: 1000
             if products and !products.empty?
               products.map{|p| update(p, active: 0)}
             end

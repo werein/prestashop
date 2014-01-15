@@ -24,8 +24,8 @@ module Prestashop
         { language: { val: value, attr: { id: settings.id_language }}} if value
       end
 
-      def lang_hash value, id_lang
-        { language: { val: value, attr: { id: id_lang }}} if value
+      def hash_lang name, id_lang
+        { language: { val: name, attr: { id: id_lang }}} if name
       end
 
       class << self

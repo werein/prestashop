@@ -5,9 +5,10 @@ module Prestashop
       resource :categories
       model :category
 
-      attr_reader :id_parent, :id_shop_default, :active, :is_root_category
+      attr_accessor :id_lang, :id_parent, :id_shop_default, :active, :is_root_category
 
       def initialize args = {}
+        @id_lang          = args.fetch(:id_lang, Client.id_language)
         @id_parent        = args.fetch(:id_parent, 2)
         @id_shop_default  = args.fetch(:id_shop_default, 1)
         @active           = args.fetch(:active, 1)
@@ -51,7 +52,7 @@ module Prestashop
 
       # Find category by name and id parent, create new one from hash, when doesn't exist
       def find_or_create
-        category = Category.find_in_cache name, id_parent
+        category = self.class.find_in_cache id_parent, name, id_lang
         unless category
           category = create
           settings.clear_categories_cache
@@ -64,10 +65,8 @@ module Prestashop
         # Search for category based on args on cached categories, see #cache and #Client::Settings.categories_cache
         # Returns founded category or nil
         #
-        def find_in_cache name, id_parent
-          found = settings.categories_cache.find do |c| 
-            c[:id_parent][:val] == id_parent and c[:name].lang_search(name)
-          end
+        def find_in_cache id_parent, name, id_lang
+          Client.categories_cache.find{ |c| c[:id_parent] == id_parent and c[:name].find_lang(name, id_lang) }
         end
 
         # Requesting all on Prestashop API, displaying id, id_parent, name
