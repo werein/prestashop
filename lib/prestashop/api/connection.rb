@@ -74,6 +74,10 @@ module Prestashop
       # * +id+        - ID of requested item, not required
       #
       def head resource, id = nil
+        id.to_i
+        raise ArgumentError, "resource: #{resource} must be string or symbol" unless resource.kind_of?(String) or resource.kind_of?(Symbol)
+        raise ArgumentError, "id: #{id} must be integer or nil" unless id.kind_of?(Integer) or id == nil
+        
         response = connection.head path(resource, id)
         if response.success?
           true # response.body 
@@ -91,6 +95,10 @@ module Prestashop
       # * +opts+      - Param name, value based on Hash key and value.
       #
       def get resource, id = nil, opts = {}
+        id.to_i unless id.kind_of?(Array)
+        raise ArgumentError, "resource: #{resource} must be string or symbol" unless resource.kind_of?(String) or resource.kind_of?(Symbol)
+        raise ArgumentError, "id: #{id} must be integer, array or nil" unless id.kind_of?(Integer) or id.kind_of?(Array) or id == nil
+
         white_list = %w(filter display sort limit schema date)
         params = {}
         opts.each do |name, value|
@@ -115,6 +123,8 @@ module Prestashop
       # * +:payload+  - posted attachement
       #
       def post resource, payload
+        raise ArgumentError, "resource: #{resource} must be string or symbol" unless resource.kind_of?(String) or resource.kind_of?(Symbol)
+
         response = connection.post path(resource), payload
         if response.success? 
           response.body.parse
@@ -132,6 +142,10 @@ module Prestashop
       # * +:payload+  - posted attachement
       #
       def put resource, id, payload
+        id.to_i
+        raise ArgumentError, "resource: #{resource} must be string or symbol" unless resource.kind_of?(String) or resource.kind_of?(Symbol)
+        raise ArgumentError, "id: #{id} must be integer" unless id.kind_of?(Integer)
+
         response = connection.put path(resource, id), payload
         if response.success?
           response.body.parse
@@ -148,6 +162,10 @@ module Prestashop
       # * +:id+       - ID of deleted item
       #
       def delete resource, id
+        id.to_i
+        raise ArgumentError, "resource: #{resource} must be string or symbol" unless resource.kind_of?(String) or resource.kind_of?(Symbol)
+        raise ArgumentError, "id: #{id} must be integer" unless id.kind_of?(Integer)
+
         response = connection.delete path(resource, id)
         if response.success?
           true # response.body
@@ -166,6 +184,11 @@ module Prestashop
       # * +file+      - Original file
       #
       def upload type, resource, id, payload, file
+        id.to_i
+        raise ArgumentError, "type: #{type} must be string or symbol" unless resource.kind_of?(String) or resource.kind_of?(Symbol)
+        raise ArgumentError, "resource: #{resource} must be string or symbol" unless resource.kind_of?(String) or resource.kind_of?(Symbol)
+        raise ArgumentError, "id: #{id} must be integer" unless id.kind_of?(Integer)
+
         response = connection.post upload_path(type, resource, id), payload
         file.destroy!
         if response.success?
