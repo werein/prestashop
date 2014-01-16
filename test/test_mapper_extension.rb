@@ -12,7 +12,7 @@ module Prestashop
       before do
         Car.stubs(:resource).returns(:cars)
         Car.stubs(:model).returns(:car)
-        stub_request(:get, 'http://123:@localhost.com/api')
+        stub_request(:get, 'http://123:@localhost.com/api/')
         connection = Api::Connection.new('123', 'localhost.com')
         Client.stubs(:connection).returns(connection)
       end

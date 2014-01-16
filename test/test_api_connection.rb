@@ -7,14 +7,14 @@ module Prestashop
 
       describe "invalid connection" do 
         it "should not be created" do 
-          stub_request(:get, 'http://123:@localhost.com/api').to_return(status: [401, "Welcome to PrestaShop Webservice, please enter the authentication key as the login. No password required."])
+          stub_request(:get, 'http://123:@localhost.com/api/').to_return(status: [401, "Welcome to PrestaShop Webservice, please enter the authentication key as the login. No password required."])
           ->{ Connection.new '123', 'http://localhost.com' }.must_raise InvalidCredentials
         end
       end
 
       describe "valid connection" do 
         let(:connection)    { Connection.new '123', 'http://localhost.com' }
-        before              { stub_request(:get, 'http://123:@localhost.com/api') }
+        before              { stub_request(:get, 'http://123:@localhost.com/api/') }
 
         it "should work" do 
           connection.test.must_equal true
@@ -70,7 +70,7 @@ module Prestashop
       describe "error expecting" do
         let(:connection)    { Connection.new '123', 'http://localhost.com' }
         before do 
-          stub_request(:get, 'http://123:@localhost.com/api')
+          stub_request(:get, 'http://123:@localhost.com/api/')
           response.expects(:parse_error)
         end
 
