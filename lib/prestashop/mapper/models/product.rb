@@ -160,8 +160,8 @@ module Prestashop
       def create
         response = super
         if response
-          sa = response[:associations][:stock_availables][:stock_available][:id]
-          StockAvailable.update(sa, quantity: quantity)
+          sa_id = response[:associations][:stock_availables][:stock_available][:id]
+          StockAvailable.new(sa_id).update(quantity: quantity)
         end
         response
       end

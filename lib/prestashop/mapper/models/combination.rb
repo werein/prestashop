@@ -68,8 +68,7 @@ module Prestashop
       def create 
         response = super
         if response
-          sa = StockAvailable.find_by 'filter[id_product]' => id_product, 'filter[id_product_attribute]' => response[:id]
-          StockAvailable.update(sa, quantity: quantity)
+          StockAvailable.new(id_product: id_product, id_product_attribute: response[:id]).update(quantity: quantity)
         end
         response
       end
