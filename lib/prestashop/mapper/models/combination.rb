@@ -5,8 +5,10 @@ module Prestashop
       resource :combinations
       model :combination
     
-      attr_reader :id_product, :location, :ean13, :upc, :quantity, :reference, :supplier_reference, :wholesale_price, :original_price, :product_price, :ecotax, :minimal_quantity,
-                  :default_on, :available_date, :quantity, :value_ids, :image_ids
+      attr_accessor :id_product, :location, :ean13, :upc, :quantity, :reference, :supplier_reference, :wholesale_price, :original_price, :product_price, :ecotax, :minimal_quantity,
+                  :default_on, :available_date, :quantity
+
+      attr_reader :product_options, :images
 
       def initialize args = {}
         @id_product       = args.fetch(:id_product)
@@ -17,18 +19,13 @@ module Prestashop
         @reference        = args.fetch(:reference)
         @supplier_reference = Client.supplier
         @wholesale_price  = args[:wholesale_price]
-        @original_price   = args.fetch(:price)
-        @product_price    = args.fetch(:product_price)
+        @original_price   = args[:original_price]
+        @product_price    = args[:product_price]
         @ecotax           = args[:ecotax]
         @minimal_quantity = args.fetch(:minimal_quantity, 1)
         @default_on       = args.fetch(:default_on, 0)
         @available_date   = Date.today.strftime("%F")
         @quantity         = args.fetch(:quantity, 0)
-        @value_ids        = args[:value_ids]
-      end
-
-      def image_ids= image_ids
-        @image_ids = image_ids
       end
 
       def vat
@@ -51,67 +48,55 @@ module Prestashop
           quantity:           quantity,
           associations: {}
         }
-        if value_ids
+        if product_options
           combination[:associations][:product_option_values] = {}
-          combination[:associations][:product_option_values][:product_option_value] = hash_ids(value_ids)
+          combination[:associations][:product_option_values][:product_option_value] = hash_ids(product_options)
         end
-        if image_ids
+        if images
           combination[:associations][:images] = {}
-          combination[:associations][:images][:image] = hash_ids(image_ids)
+          combination[:associations][:images][:image] = hash_ids(images)
         end
         combination
       end
+
+      # Find combination by +reference+ and +id_product+, returns +id+
+      def id
+        @id ||= self.class.find_by 'filter[reference]' => reference, 'filter[id_product]' => id_product
+      end
+      alias :find? :id
 
       def create 
-        combination = super
-        sa = StockAvailable.find_by 'filter[id_product]' => id_product, 'filter[id_product_attribute]' => combination[:id]
-        StockAvailable.update(sa, quantity: quantity)
-        combination
-      end
-
-      def update id 
-        update = {
-          available_date: available_date
-        }
-
-        combination = Combination.update(id, update)
-        if Client.update_stock
-          sa = StockAvailable.find_by 'filter[id_product]' => id_product, 'filter[id_product_attribute]' => combination[:id]
+        response = super
+        if response
+          sa = StockAvailable.find_by 'filter[id_product]' => id_product, 'filter[id_product_attribute]' => response[:id]
           StockAvailable.update(sa, quantity: quantity)
         end
-        combination
+        response
+      end
+
+      def update options = {}
+        self.class.update(id, options)
+      end
+
+      def product_options= product_options
+        @product_options = []
+        product_options.each do |product_option|
+          id_o = ProductOption.new(name: product_option[:name]).find_or_create
+          @product_options << ProductOptionValue.new(name: product_option[:value], id_attribute_group: id_o).find_or_create
+        end
+      end
+
+      def images= images
+        @images = Image.new(resource: 'products', resource_id: id_product, source: images).upload
       end
 
       class << self
-        def resolve id_product, resource, product_price
-          if resource.kind_of?(Array)
-            resource.each_with_index do |res, index|
-              value_ids = []
-              res[:options].each do |option|
-                id_o = ProductOption.new(name: option[:name]).find_or_create
-                value_ids << ProductOptionValue.new(name: option[:value], id_attribute_group: id_o).find_or_create
-              end
-              default_on = index == 0 ? 1 : 0
-              combination = Combination.new(id_product: id_product, reference: res[:reference], price: res[:price], product_price: product_price, quantity: res[:quantity], default_on: default_on, value_ids: value_ids)
-              current_combinations = where 'filter[id_product]' => id_product, 'filter[reference]' => res[:reference]
-              if current_combinations
-                current_combinations.map{|id| combination.update(id)} if Client.update_enabled
-              else
-                combination.image_ids = Image.new(resource: 'products', resource_id: id_product, source: res[:images]).upload
-                combination.create
-              end
-            end
-          end
-        end
-
-        def deactivate
-          if Client.deactivate and Client.update_enabled
-            first = (Date.today-365).strftime("%F")
-            last = (Date.today-1).strftime("%F")
-            combinations = where 'filter[date_upd]' => "[#{first},#{last}]", date: 1, 'filter[supplier_reference]' => Client.supplier, limit: 1000
-            if combinations and !combinations.empty?
-              combinations.map{|c| delete(c)}
-            end
+        def deactivate supplier
+          first = (Date.today-365).strftime("%F")
+          last = (Date.today-1).strftime("%F")
+          combinations = where 'filter[date_upd]' => "[#{first},#{last}]", date: 1, 'filter[supplier_reference]' => supplier, limit: 1000
+          if combinations and !combinations.empty?
+            combinations.map{|c| delete(c)}
           end
         end
       end

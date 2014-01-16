@@ -150,51 +150,35 @@ module Prestashop
         product
       end
 
+      # Find product by +reference+ and +id_supplier+, returns +id+
+      def id
+        @id ||= self.class.find_by 'filter[reference]' => reference, 'filter[id_supplier]' => id_supplier
+      end
+      alias :find? :id
+
+      # Create new product with quantity
+      def create
+        response = super
+        if response
+          sa = response[:associations][:stock_availables][:stock_available][:id]
+          StockAvailable.update(sa, quantity: quantity)
+        end
+        response
+      end
+
+      # Update product with given options
+      def update options = {}
+        self.class.update(id, options)
+      end
+
       # Generate hash of single feature
-      def feature_hash hash
-        { id: hash[:id_feature],
-          id_feature_value: hash[:id_feature_value]
-        } if hash
+      def feature_hash id_feature, id_feature_value
+        { id: id_feature, id_feature_value: id_feature_value } if id_feature and id_feature_value
       end
 
       # Generate hash of features
       def features_hash
-        id_features.map{|f| feature_hash(f)} if id_features
-      end
-
-      def create_or_update
-        current_products = self.class.where 'filter[reference]' => reference, 'filter[id_supplier]' => id_supplier
-        if current_products 
-          current_products.map{|id| update(id)} if Client.update_enabled
-        else
-          create if Client.import_enabled
-        end
-      end
-
-      def create
-        product = super
-        if product
-          sa = product[:associations][:stock_availables][:stock_available][:id]
-          StockAvailable.update(sa, { quantity: quantity }) if quantity
-          Image.new(resource: 'products', resource_id: product[:id], source: images).upload
-          Combination.resolve product[:id], combinations, price if combinations
-        end
-        product
-      end
-
-      def update id
-        options = {}
-        options[:price] = price if Client.update_price
-        options[:id_tax_rules_group] = id_tax_rules_group if Client.vat_enabled
-
-        product = self.class.update(id, options)
-
-        if product
-          sa = StockAvailable.find_by 'filter[id_product]' => product[:id], 'filter[id_product_attribute]' => 0
-          StockAvailable.update(sa, quantity: quantity, id_shop: id_shop_default) if Client.update_stock
-          Combination.resolve product[:id], combinations, price if combinations and Client.update_enabled
-        end
-        product
+        id_features.map{|f| feature_hash(f[:id_feature], f[:id_feature_value])} if id_features
       end
 
       class << self
@@ -208,16 +192,13 @@ module Prestashop
           product
         end
 
-        def deactivate
-          if Client.deactivate and Client.update_enabled
-            first = (Date.today-365).strftime("%F")
-            last = (Date.today-1).strftime("%F")
-            products = where 'filter[date_upd]' => "[#{first},#{last}]", date: 1, 'filter[id_supplier]' => Client.id_supplier, 'filter[active]' => 1, limit: 1000
-            if products and !products.empty?
-              products.map{|p| update(p, active: 0)}
-            end
+        def deactivate id_supplier
+          first = (Date.today-365).strftime("%F")
+          last = (Date.today-1).strftime("%F")
+          products = where 'filter[date_upd]' => "[#{first},#{last}]", date: 1, 'filter[id_supplier]' => id_supplier, 'filter[active]' => 1, limit: 1000
+          if products and !products.empty?
+            products.map{|p| update(p, active: 0)}
           end
-          Combination.deactivate
         end
       end
     end

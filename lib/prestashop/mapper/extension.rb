@@ -77,7 +77,7 @@ module Prestashop
         # === Example:
         #   Car.update_hash(1, name: 'BMW7') # => {name: 'BMW7', manufacturer: 'BMW'}
         #
-        def update_hash id, options
+        def update_hash id, options = {}
           original = defined?(fixed_hash(nil)) ? fixed_hash(id) : find(id)
           original.merge(options)
         end
@@ -87,7 +87,7 @@ module Prestashop
         # === Example:
         #   Car.update_payload(1, name: 'BMW 7') # => <prestashop xmlns:xlink="http://www.w3.org/1999/xlink"><car><name><![CDATA[BMW 7]]></name></car></prestashop>
         #
-        def update_payload id, options
+        def update_payload id, options = {}
           Api::Converter.build(self.resource, self.model, update_hash(id, options))
         end
 
