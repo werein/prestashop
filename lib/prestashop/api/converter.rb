@@ -28,6 +28,9 @@ module Prestashop
       #
       def self.parse xml
         result = Nokogiri::XML xml
+
+        raise ParserError unless result.root
+
         xml_node_to_hash result.root
       end
 

@@ -12,5 +12,7 @@ module Prestashop
         @response = response
       end
     end
+
+    class ParserError < RuntimeError; end #:nodoc:
   end
 end

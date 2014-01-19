@@ -78,12 +78,15 @@ module Prestashop
         raise ArgumentError, "resource: #{resource} must be string or symbol" unless resource.kind_of?(String) or resource.kind_of?(Symbol)
         raise ArgumentError, "id: #{id} must be integer or nil" unless id.kind_of?(Integer) or id == nil
         
-        response = connection.head path(resource, id)
+        request_path = path(resource, id)
+        response = connection.head request_path
         if response.success?
           true # response.body 
         else
           raise RequestFailed.new(response), response.body.parse_error
         end
+      rescue ParserError
+        raise ParserError, "Response couldn't be parsed for #{request_path}"
       end
       alias :check :head
 
@@ -107,12 +110,15 @@ module Prestashop
           end
         end 
 
-        response = connection.get path(resource, id), params
+        request_path = path(resource, id)
+        response = connection.get request_path, params
         if response.success? 
           response.body.parse
         else
           raise RequestFailed.new(response), response.body.parse_error
         end
+      rescue ParserError
+        raise ParserError, "Response couldn't be parsed for #{request_path} with #{params}"
       end
       alias :read :get
 
@@ -125,12 +131,15 @@ module Prestashop
       def post resource, payload
         raise ArgumentError, "resource: #{resource} must be string or symbol" unless resource.kind_of?(String) or resource.kind_of?(Symbol)
 
-        response = connection.post path(resource), payload
+        request_path = path(resource)
+        response = connection.post request_path, payload
         if response.success? 
           response.body.parse
         else
           raise RequestFailed.new(response), "#{response.body.parse_error}. XML SENT: #{payload}"
         end
+      rescue ParserError
+        raise ParserError, "Response couldn't be parsed for #{request_path}. XML SENT: #{payload}"
       end
       alias :create :post
 
@@ -146,12 +155,15 @@ module Prestashop
         raise ArgumentError, "resource: #{resource} must be string or symbol" unless resource.kind_of?(String) or resource.kind_of?(Symbol)
         raise ArgumentError, "id: #{id} must be integer" unless id.kind_of?(Integer)
 
-        response = connection.put path(resource, id), payload
+        request_path = path(resource, id)
+        response = connection.put request_path, payload
         if response.success?
           response.body.parse
         else
           raise RequestFailed.new(response), "#{response.body.parse_error}. XML SENT: #{payload}"
         end
+      rescue ParserError
+        raise ParserError, "Response couldn't be parsed for #{request_path}. XML SENT: #{payload}"
       end
       alias :update :put
 
@@ -166,12 +178,15 @@ module Prestashop
         raise ArgumentError, "resource: #{resource} must be string or symbol" unless resource.kind_of?(String) or resource.kind_of?(Symbol)
         raise ArgumentError, "id: #{id} must be integer" unless id.kind_of?(Integer)
 
-        response = connection.delete path(resource, id)
+        request_path = path(resource, id)
+        response = connection.delete request_path
         if response.success?
           true # response.body
         else
           raise RequestFailed.new(response), response.body.parse_error
         end
+      rescue ParserError
+        raise ParserError, "Response couldn't be parsed for #{request_path}. XML SENT: #{payload}"
       end
 
       # Send file via payload After that call POST on WebService API, returns parsed Prestashop response if was request successfull or raise error, when request failed.
@@ -189,13 +204,16 @@ module Prestashop
         raise ArgumentError, "resource: #{resource} must be string or symbol" unless resource.kind_of?(String) or resource.kind_of?(Symbol)
         raise ArgumentError, "id: #{id} must be integer" unless id.kind_of?(Integer)
 
-        response = connection.post upload_path(type, resource, id), payload
+        request_path = upload_path(type, resource, id)
+        response = connection.post request_path, payload
         file.destroy!
         if response.success?
           response.body.parse
         else
           raise RequestFailed.new(response), response.body.parse_error
         end
+      rescue ParserError
+        raise ParserError, "Response couldn't be parsed for #{request_path}. XML SENT: #{payload}"
       end
 
       # Test connection based on current credentials and connection, return true or false, based if request was successfull or not.
