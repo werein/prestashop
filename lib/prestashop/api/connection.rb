@@ -86,7 +86,7 @@ module Prestashop
           raise RequestFailed.new(response), response.body.parse_error
         end
       rescue ParserError
-        raise ParserError, "Response couldn't be parsed for #{request_path}"
+        raise ParserError, "Response couldn't be parsed for: #{request_path}. RESPONSE: #{response.body}"
       end
       alias :check :head
 
@@ -118,7 +118,7 @@ module Prestashop
           raise RequestFailed.new(response), response.body.parse_error
         end
       rescue ParserError
-        raise ParserError, "Response couldn't be parsed for #{request_path} with #{params}"
+        raise ParserError, "Response couldn't be parsed for: #{request_path} with #{params}. RESPONSE: #{response.body}"
       end
       alias :read :get
 
@@ -139,7 +139,7 @@ module Prestashop
           raise RequestFailed.new(response), "#{response.body.parse_error}. XML SENT: #{payload}"
         end
       rescue ParserError
-        raise ParserError, "Response couldn't be parsed for #{request_path}. XML SENT: #{payload}"
+        raise ParserError, "Response couldn't be parsed for: #{request_path}. RESPONSE: #{response.body} XML SENT: #{payload}"
       end
       alias :create :post
 
@@ -163,7 +163,7 @@ module Prestashop
           raise RequestFailed.new(response), "#{response.body.parse_error}. XML SENT: #{payload}"
         end
       rescue ParserError
-        raise ParserError, "Response couldn't be parsed for #{request_path}. XML SENT: #{payload}"
+        raise ParserError, "Response couldn't be parsed for: #{request_path}. RESPONSE: #{response.body} XML SENT: #{payload}"
       end
       alias :update :put
 
@@ -186,7 +186,7 @@ module Prestashop
           raise RequestFailed.new(response), response.body.parse_error
         end
       rescue ParserError
-        raise ParserError, "Response couldn't be parsed for #{request_path}. XML SENT: #{payload}"
+        raise ParserError, "Response couldn't be parsed for: #{request_path}. RESPONSE: #{response.body} XML SENT: #{payload}"
       end
 
       # Send file via payload After that call POST on WebService API, returns parsed Prestashop response if was request successfull or raise error, when request failed.
@@ -213,7 +213,7 @@ module Prestashop
           raise RequestFailed.new(response), response.body.parse_error
         end
       rescue ParserError
-        raise ParserError, "Response couldn't be parsed for #{request_path}. XML SENT: #{payload}"
+        raise ParserError, "Response couldn't be parsed for: #{request_path}. RESPONSE: #{response.body} XML SENT: #{payload}"
       end
 
       # Test connection based on current credentials and connection, return true or false, based if request was successfull or not.
