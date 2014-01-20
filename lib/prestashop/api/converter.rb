@@ -40,7 +40,12 @@ module Prestashop
       # * +xml+ - Response from failure API call
       #
       def self.parse_error response
-        parse(response)[:errors][:error][:message]
+        parsed = parse(response)
+        if parsed[:errors] and parsed[:errors][:error] and parsed[:errors][:error][:message]
+          parsed[:errors][:error][:message]
+        else
+          raise ParserError
+        end
       end
 
       # Build XML nodes based on given source, skipping +attr+ or +val+ keys if source is Hash
