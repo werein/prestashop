@@ -34,6 +34,16 @@ module Prestashop
         product.expects(:feature_hash).with(1, 2)
         product.features_hash
       end
+
+      it "should have right reference" do 
+        product.reference = ''
+        product.name = 'Apple iPhone'
+        product.reference.must_equal '000791a4a46769638ea0baae884bb271'
+        product.reference = 'apple-iphone'
+        product.reference.must_equal 'apple-iphone'
+        product.reference = 'apple-iphone-with-reference-longer-then-32-chars-couldnt-be-accepted'
+        product.reference.must_equal '45968b3439f3dee47835e975e2cad98c'
+      end 
     end 
   end
 end

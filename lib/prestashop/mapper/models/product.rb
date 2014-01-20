@@ -5,8 +5,10 @@ module Prestashop
       resource :products
       model    :product
 
-      attr_reader :id_lang, :id_shop_default, :id_supplier, :vat, :on_sale, :online_only, :ean, :upc, :ecotax, :minimal_quantity, 
+      attr_accessor :id_lang, :id_shop_default, :id_supplier, :vat, :on_sale, :online_only, :ean, :upc, :ecotax, :minimal_quantity, 
                   :original_price, :wholesale_price, :out_of_stock, :condition, :quantity, :categories, :images, :manufacturer, :features, :combinations
+      attr_writer :name, :reference
+
 
       def initialize args = {}
         @id_lang            = args.fetch(:id_lang, Client.id_language)
@@ -84,7 +86,11 @@ module Prestashop
       end
 
       def reference
-        @reference ? @reference : name.parameterize
+        if @reference.empty?
+          Digest::MD5.hexdigest(name)
+        else
+          @reference.length > 32 ? Digest::MD5.hexdigest(@reference) : @reference
+        end
       end
 
       def active
