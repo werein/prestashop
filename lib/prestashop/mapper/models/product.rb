@@ -161,7 +161,7 @@ module Prestashop
         response = super
         if response
           sa_id = response[:associations][:stock_availables][:stock_available][:id]
-          StockAvailable.new(sa_id).update(quantity: quantity)
+          StockAvailable.new(id: sa_id).update(quantity: quantity)
         end
         response
       end
