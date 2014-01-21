@@ -35,6 +35,7 @@ module Prestashop
           builder.url_prefix = api_url
           builder.request     :multipart
           builder.request     :url_encoded
+          builder.request     :retry, 5
           # builder.response    :logger
           builder.adapter     :net_http
           builder.basic_auth  api_key, ''
