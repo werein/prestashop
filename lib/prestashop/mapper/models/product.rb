@@ -87,7 +87,7 @@ module Prestashop
 
       def reference
         if @reference and not @reference.to_s.empty?
-          @reference.length > 32 ? Digest::MD5.hexdigest(@reference) : @reference
+          @reference.to_s.length > 32 ? Digest::MD5.hexdigest(@reference) : @reference
         else
           Digest::MD5.hexdigest(name)
         end
