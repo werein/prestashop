@@ -48,7 +48,7 @@ module Prestashop
 
       # Get id manufacturer, see #Manufacturer.resolver for params and returns
       def id_manufacturer
-        @id_manufacturer ||= Manufacturer.resolver(@manufacturer)
+        @id_manufacturer ||= Manufacturer.new(name: manufacturer).find_or_create
       end
 
       # Get id features, see #ProductFeature.resolver for params and returns

@@ -5,11 +5,14 @@ module Prestashop
       resource :manufacturers
       model    :manufacturer
 
-      attr_reader :active
+      attr_accessor :id, :id_lang, :active
+      attr_writer :name, :description, :short_description, :meta_title, :meta_description, :meta_keywords
 
       def initialize args = {}
+        @id                 = args[:id]
+        @id_lang            = args.fetch(:id_lang, Client.id_language)
         @active             = args.fetch(:active, 1)
-        @name               = args.fetch(:name)
+        @name               = args[:name]
         @description        = args[:description]
         @short_description  = args[:short_description]
         @meta_title         = args[:meta_title]
@@ -30,37 +33,40 @@ module Prestashop
       end
 
       def hash
+        validate!
         { active:             active,
           name:               name,
-          description:        lang(description),
-          short_description:  lang(short_description),
-          meta_title:         lang(name),
-          meta_description:   lang(short_description),
-          meta_keywords:      lang(meta_keywords) }      
+          description:        hash_lang(description, id_lang),
+          short_description:  hash_lang(short_description, id_lang),
+          meta_title:         hash_lang(name, id_lang),
+          meta_description:   hash_lang(short_description, id_lang),
+          meta_keywords:      hash_lang(meta_keywords, id_lang) }      
       end
 
       def find_or_create
-        manufacturer = Manufacturer.find_in_cache name: name
-        unless manufacturer
-          manufacturer = create
-          settings.clear_manufacturers_cache
+        if name and !name.empty?
+          manufacturer = self.class.find_in_cache name
+          unless manufacturer
+            manufacturer = create
+            settings.clear_manufacturers_cache
+          end
+          manufacturer[:id]
         end
-        manufacturer[:id]
+      end
+
+      def validate!
+        raise ArgumentError, 'id lang must be number' unless id_lang.kind_of?(Integer)
+        raise ArgumentError, 'active must be number' unless active.kind_of?(Integer)
+        raise ArgumentError, 'name must string' unless name.kind_of?(String)
       end
 
       class << self
-        def find_in_cache args = {}
-          settings.manufacturers_cache.find{|m| m[:name] == args[:name] } if settings.manufacturers_cache
+        def find_in_cache name
+          settings.manufacturers_cache.find{|m| m[:name] == name } if settings.manufacturers_cache
         end
 
         def cache
-          all display: '[id, name]'
-        end
-
-        def resolver resource
-          if resource.kind_of?(String) and !resource.empty?
-            new(name: resource).find_or_create
-          end
+          all display: '[id,name]'
         end
       end
     end
