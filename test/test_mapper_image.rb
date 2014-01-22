@@ -36,11 +36,10 @@ module Prestashop
       end
 
       it "should perform upload" do
-        file = mock('file')
+        WebMock.allow_net_connect!
         Client.expects(:upload)
-        MiniMagick::Image.stubs(:open).returns(file)
-        image.stubs(:payload).returns({})
-        image.uploader('http://locahost.com/image/first.png')
+        image.uploader('http://upload.wikimedia.org/wikipedia/en/b/bc/Wiki.png')
+        image.file.expects(:format).never
       end
 
       it "should not take invalid url" do 

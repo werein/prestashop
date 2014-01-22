@@ -30,6 +30,7 @@ module Prestashop
       def uploader source
         if source =~ URI::regexp
           self.file = MiniMagick::Image.open(source)
+          file.format 'png' unless %w(jpg jpeg png gif).include?(file[:format])
           result = Client.upload 'images', resource, resource_id, payload, file
           result[:image][:id] if result
         else
