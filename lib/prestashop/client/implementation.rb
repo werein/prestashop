@@ -4,7 +4,7 @@ module Prestashop
   module Client
     class Implementation
       include Singleton
-      attr_reader :connection, :settings
+      attr_reader :connection, :cache
 
       # Initialize new client
       #
@@ -13,15 +13,15 @@ module Prestashop
       # * +api_url+ - see #Api::Connection.new
       # * +settings+ - see #Settings.new
       #
-      def initialize api_key, api_url, options = {}
+      def initialize api_key, api_url
         @connection = Api::Connection.new api_key, api_url
-        @settings = Settings.new options
+        @cache = Cache.new
       end
 
       class << self
         # Create new user implementation, keep it in current thread to allow multithearding, see (#new)
-        def create api_key, api_url, options = {}
-          Thread.current[:prestashop_client] = new api_key, api_url, options
+        def create api_key, api_url
+          Thread.current[:prestashop_client] = new api_key, api_url
           current
         end
 

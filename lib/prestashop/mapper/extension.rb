@@ -2,7 +2,6 @@ module Prestashop
   module Mapper
     module Extension
       module ClassMethods
-        def settings; Client end
 
         # Determinate if model with class resource exists with given id
         #
@@ -120,7 +119,6 @@ module Prestashop
       end
       
       module InstanceMethods
-        def settings; Client end
 
         # Generate hash with ID
         #
