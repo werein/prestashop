@@ -7,11 +7,12 @@ module Prestashop
       resource :images
       model :image
 
-      attr_accessor :resource, :resource_id, :source, :file
+      attr_accessor :id, :resource, :id_resource, :source, :file
 
       def initialize args = {}
+        @id          = args[:id]
         @resource    = args.fetch(:resource)
-        @resource_id = args.fetch(:resource_id)
+        @id_resource = args.fetch(:id_resource)
         @source      = args.fetch(:source)
       end
 
@@ -31,7 +32,7 @@ module Prestashop
         if source =~ URI::regexp
           self.file = MiniMagick::Image.open(source)
           file.format 'png' unless %w(jpg jpeg png gif).include?(file[:format])
-          result = Client.upload 'images', resource, resource_id, payload, file
+          result = Client.upload 'images', resource, id_resource, payload, file
           result[:image][:id] if result
         else
           false # Not valid url

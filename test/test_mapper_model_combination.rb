@@ -3,7 +3,7 @@ require_relative 'test_helper'
 module Prestashop
   module Mapper
     describe Combination do
-      let(:category) { Category.new(attributes_for(:category)) }
+      let(:combination) { Combination.new(attributes_for(:combination_basic)) }
       before do
         xml = <<-EOF
         <?xml version="1.0" encoding="UTF-8"?>
@@ -40,6 +40,21 @@ module Prestashop
           </combination>
         </prestashop>
         EOF
+      end
+
+      it "should look for id, when doesnt exist" do
+        Combination.expects(:find_by).returns(false)
+        combination.find?.must_equal false
+        Combination.expects(:find_by).returns(1)
+        combination.id.must_equal 1
+        combination.id = 2
+        combination.id.must_equal(2)
+      end
+
+      it "should update model" do 
+        Combination.expects(:update).with(1, quantity: 100)
+        combination.stubs(:id).returns(1)
+        combination.update(quantity: 100)
       end
     end
   end

@@ -5,11 +5,22 @@ module Prestashop
       resource :suppliers
       model :supplier
 
-      attr_accessor :active, :name
+      attr_accessor :id, :link_rewrite, :name, :active, :description, :meta_title, :meta_description, :meta_keywords
+      attr_accessor :id_lang
 
       def initialize args = {}
-        @active = args.fetch(:active, 1)
-        @name = args.fetch(:name)
+        @id               = args[:id]
+        @link_rewrite     = args[:link_rewrite]
+        @name             = args.fetch(:name)
+        @active           = args.fetch(:active, 1)
+        # date_add
+        # date_upd
+        @description      = args[:description]
+        @meta_title       = args[:meta_title]
+        @meta_description = args[:meta_description]
+        @meta_keywords    = args[:meta_keywords]
+
+        @id_lang          = args[:id_lang]
       end
 
       # Hash is used as default source for #create

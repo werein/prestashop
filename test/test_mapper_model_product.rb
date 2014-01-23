@@ -5,11 +5,6 @@ module Prestashop
     describe Product do
       let(:product) { Product.new(attributes_for(:product)) }
       before do
-        Client.stubs(:id_language).returns(2)
-        Client.stubs(:id_supplier).returns(1)
-        Client.stubs(:available_now).returns('Available now')
-        Client.stubs(:available_later).returns('Available later')
-
         xml = <<-EOF
         <?xml version="1.0" encoding="UTF-8"?>
         <prestashop xmlns:xlink="http://www.w3.org/1999/xlink">

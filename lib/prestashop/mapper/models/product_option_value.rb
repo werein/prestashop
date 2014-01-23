@@ -5,13 +5,17 @@ module Prestashop
       resource :product_option_values
       model :product_option_value
 
-      attr_accessor :id_lang, :name, :id_attribute_group, :color
+      attr_accessor :id, :id_attribute_group, :color, :position, :name
+      attr_accessor :id_lang
 
       def initialize args = {}
-        @id_lang    = args.fetch(:id_lang, Client.id_language)
-        @name       = args.fetch(:name)
+        @id                 = args[:id]
         @id_attribute_group = args.fetch(:id_attribute_group)
-        @color      = 0
+        @color              = args.fetch(:color, 0)
+        @position           = args[:position]
+        @name               = args.fetch(:name)
+
+        @id_lang            = args.fetch(:id_lang)
       end
 
       def hash

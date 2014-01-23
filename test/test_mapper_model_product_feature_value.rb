@@ -5,8 +5,6 @@ module Prestashop
     describe ProductFeatureValue do
       let(:feature_value) { ProductFeatureValue.new(attributes_for(:product_feature_value_basic)) }
       before do 
-        Client.stubs(:id_language).returns(2)
-
         xml = <<-EOT
         <?xml version="1.0" encoding="UTF-8"?>
         <prestashop xmlns:xlink="http://www.w3.org/1999/xlink">

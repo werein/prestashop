@@ -5,11 +5,16 @@ module Prestashop
       resource :product_features
       model :product_feature
 
-      attr_accessor :id_lang, :name
+      attr_accessor :id, :position
+      attr_writer   :name
+      attr_accessor :id_lang
 
       def initialize args = {}
-        @id_lang = args.fetch(:id_lang, Client.id_language)
-        @name    = args.fetch(:name)
+        @id       = args[:id]
+        @position = args[:position]
+        @name     = args.fetch(:name)
+
+        @id_lang  = args.fetch(:id_lang)
       end
 
       def name
@@ -44,14 +49,14 @@ module Prestashop
           all display: '[id,name]'
         end
 
-        def resolver resources
+        def create_from_hash resources, id_lang
           resources = [resources] if resources.kind_of?(Hash)
           if resources.kind_of?(Array)
             features = []
             resources.each do |resource|
               if resource[:feature] and !resource[:feature].empty? and resource[:value] and !resource[:value].empty?
-                id_f = new(name: resource[:feature]).find_or_create
-                id_fv = ProductFeatureValue.new(value: resource[:value], id_feature: id_f).find_or_create
+                id_f = new(name: resource[:feature], id_lang: id_lang).find_or_create
+                id_fv = ProductFeatureValue.new(value: resource[:value], id_feature: id_f, id_lang: id_lang).find_or_create
                 features << { id_feature: id_f, id_feature_value: id_fv }
               end
             end 

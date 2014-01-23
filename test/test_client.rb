@@ -9,13 +9,13 @@ module Prestashop
         Client.current
       end
 
-      it "should forward connection and settings" do
+      it "should forward connection and cache" do
         client = mock 'client'
         client.expects(:connection)
-        client.expects(:settings)
+        client.expects(:cache)
         Implementation.stubs(:current).returns(client)
         Client.connection
-        Client.settings
+        Client.cache
       end
     end
   end

@@ -11,5 +11,7 @@ FactoryGirl.define do
     original_price 100
     available_now 'Available now'
     available_later 'Available later'
+
+    id_lang 2
   end
 end

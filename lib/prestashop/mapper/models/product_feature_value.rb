@@ -5,13 +5,17 @@ module Prestashop
       resource :product_feature_values
       model :product_feature_value
 
-      attr_accessor :id_lang, :id_feature, :custom, :value
+      attr_accessor :id, :id_feature, :custom
+      attr_writer   :value
+      attr_accessor :id_lang
 
       def initialize args = {}
-        @id_lang    = args.fetch(:id_lang, Client.id_language)
+        @id         = args[:id]
         @id_feature = args.fetch(:id_feature)
         @custom     = args.fetch(:custom, 0)
         @value      = args.fetch(:value)
+
+        @id_lang    = args.fetch(:id_lang)
       end
 
       def value
@@ -44,7 +48,7 @@ module Prestashop
 
       class << self
         def find_in_cache id_feature, value, id_lang
-          Client.feature_values_cache.find{|v| v[:id_feature] == id_feature and v[:value].lang_search(value, id_lang)} if Client.feature_values_cache
+          Client.feature_values_cache.find{|v| v[:id_feature] == id_feature and v[:value].find_lang(value, id_lang)} if Client.feature_values_cache
         end
 
         def cache

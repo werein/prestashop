@@ -5,20 +5,29 @@ module Prestashop
       resource :categories
       model :category
 
-      attr_accessor :id_lang, :id_parent, :id_shop_default, :active, :is_root_category
+      attr_accessor :id_lang
+      attr_accessor :id, :id_parent, :level_depth, :active, :id_shop_default, :is_root_category, :position
+      attr_writer   :name, :description, :link_rewrite
 
       def initialize args = {}
-        @id_lang          = args.fetch(:id_lang, Client.id_language)
+        @id               = args[:id]
         @id_parent        = args.fetch(:id_parent, 2)
-        @id_shop_default  = args.fetch(:id_shop_default, 1)
+        @level_depth      = args[:level_depth]
+        # nb_products_recursive
         @active           = args.fetch(:active, 1)
+        @id_shop_default  = args.fetch(:id_shop_default, 1)
         @is_root_category = 0
+        @position         = args[:position]
+        # date_add
+        # date_upd
         @name             = args.fetch(:name)
-        @description      = args[:description]
         @link_rewrite     = args[:link_rewrite]
+        @description      = args[:description]
         @meta_title       = args[:meta_title]
         @meta_description = args[:meta_description]
         @meta_keywords    = args[:meta_keywords]
+
+        @id_lang          = args.fetch(:id_lang)
       end
 
       # Category name can't have some symbols and can't be longer than 63
@@ -39,15 +48,15 @@ module Prestashop
       # Category hash structure, which will be converted to XML
       def hash
         { id_parent:        id_parent,
-          id_shop_default:  id_shop_default,
           active:           active ,
+          id_shop_default:  id_shop_default,
           is_root_category: is_root_category,
-          name:             lang(name),
-          description:      lang(description),
-          link_rewrite:     lang(link_rewrite),
-          meta_title:       lang(name),
-          meta_description: lang(description),
-          meta_keywords:    lang(meta_keywords) }
+          name:             hash_lang(name, id_lang),
+          link_rewrite:     hash_lang(link_rewrite, id_lang),
+          description:      hash_lang(description, id_lang),
+          meta_title:       hash_lang(name, id_lang),
+          meta_description: hash_lang(description, id_lang),
+          meta_keywords:    hash_lang(meta_keywords, id_lang) }
       end
 
       # Find category by name and id parent, create new one from hash, when doesn't exist
@@ -55,7 +64,7 @@ module Prestashop
         category = self.class.find_in_cache id_parent, name, id_lang
         unless category
           category = create
-          settings.clear_categories_cache
+          Client.clear_categories_cache
         end
         category[:id]
       end
@@ -77,60 +86,27 @@ module Prestashop
         # Create new category based on given param, delimited by delimiter in settings
         #
         # ==== Example:
-        #   Category.create_from_name('Apple||iPhone') # => [1, 2]
+        #   Category.create_from_name('Apple||iPhone', 2) # => [1, 2]
         #
-        def create_from_name category_name
+        def create_from_name category_name, id_lang
           if category_name and !category_name.empty?
-            names = [category_name.split(settings.delimiter)].flatten!
+            names = [category_name.split('||')].flatten!
             categories = []
             id_parent = 2
             names.each do |name|
-              id_parent = new(name: name, id_parent: id_parent).find_or_create
+              id_parent = new(name: name, id_parent: id_parent, id_lang: id_lang).find_or_create
               categories << id_parent
             end
             categories
           end
         end
 
-        # Create categories, from string, hash or array.
-        #
-        # It takes [String], [Array] or [Hash] +:default+ +:secondary+
-        #
-        # ==== Returns:
-        # Hash:
-        #   * +:id_category_default+  - ID of default category
-        #   * +:ids_category+         - Array of secondary categories
-        #
-        # ==== Example:
-        #   Category.resolver 'Apple||iPhone' # => { id_category_default: 10, ids_category: [2, 10] }
-        #   Category.resolver ['Apple||iPhone||Accessories', 'Apple||Accessories'] # => { id_category_default: 15, ids_category: [12, 10, 2, 15] }
-        #   Category.resolver default: 'Apple||Accessories', secondary: 'Apple||iPhone||Accessories' # => { id_category_default: 15, ids_category: [12, 10, 2, 15] }
-        #
-        def resolver resource
-          case [resource.class]
-          when [String]
-            categories = create_from_name resource
-            default_category = categories.last if categories
-          when [Array]
-            categories = []
-            resource.each do |res|
-              categories.concat create_from_name(res)
-            end
-            default_category = categories.last if categories
-          when [Hash]
-            if resource[:default]
-              categories = create_from_name resource[:default]
-              default_category = categories.last if categories
-              if resource[:secondary].kind_of?(Array)
-                resource[:secondary].each do |secondary|
-                  categories << create_from_name(secondary)
-                end
-              else
-                categories << create_from_name(resource[:secondary])
-              end
-            end    
+        def create_from_names category_names, id_lang
+          categories = []
+          category_names.each do |category_name|
+            categories << create_from_name(category_name, id_lang)
           end
-          { id_category_default: default_category, ids_category: categories.flatten.uniq }
+          categories.flatten.uniq
         end
       end
     end

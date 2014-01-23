@@ -5,8 +5,6 @@ module Prestashop
     describe ProductFeature do
       let(:feature) { ProductFeature.new(attributes_for(:product_feature_basic)) }
       before do 
-        Client.stubs(:id_language).returns(2)
-
         xml = <<-EOT
         <?xml version="1.0" encoding="UTF-8"?>
         <prestashop xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -61,14 +59,14 @@ module Prestashop
         feature = { feature: 'CPU', value: 'Intel' }
         ProductFeature.any_instance.stubs(:find_or_create).returns(1)
         ProductFeatureValue.any_instance.stubs(:find_or_create).returns(2)
-        ProductFeature.resolver(feature).must_equal([{ id_feature: 1, id_feature_value: 2 }])
+        ProductFeature.create_from_hash(feature, 2).must_equal([{ id_feature: 1, id_feature_value: 2 }])
       end
 
       it "should generate correct hash from string" do
         feature = [{ feature: 'CPU', value: 'Intel' }]
         ProductFeature.any_instance.stubs(:find_or_create).returns(1)
         ProductFeatureValue.any_instance.stubs(:find_or_create).returns(2)
-        ProductFeature.resolver(feature).must_equal([{ id_feature: 1, id_feature_value: 2 }])
+        ProductFeature.create_from_hash(feature, 2).must_equal([{ id_feature: 1, id_feature_value: 2 }])
       end
     end 
   end

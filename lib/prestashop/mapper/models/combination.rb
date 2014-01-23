@@ -5,36 +5,39 @@ module Prestashop
       resource :combinations
       model :combination
     
-      attr_accessor :id_product, :location, :ean13, :upc, :quantity, :reference, :supplier_reference, :wholesale_price, :original_price, :product_price, :ecotax, :minimal_quantity,
-                  :default_on, :available_date, :quantity
-
-      attr_reader :product_options, :images
+      attr_accessor :id_lang, :id_product_options, :id_images
+      attr_accessor :id, :id_product, :location, :ean13, :upc, :quantity, :reference, :supplier_reference, :wholesale_price,
+                    :price, :ecotax, :weight, :unit_price_impact, :minimal_quantity, :default_on, :available_date
 
       def initialize args = {}
-        @id_product       = args.fetch(:id_product)
-        @location         = args[:location]
-        @ean13            = args[:ean]
-        @upc              = args[:upc]
-        @quantity         = args.fetch(:quantity, 0)
-        @reference        = args.fetch(:reference)
-        @supplier_reference = Client.supplier
-        @wholesale_price  = args[:wholesale_price]
-        @original_price   = args[:original_price]
-        @product_price    = args[:product_price]
-        @ecotax           = args[:ecotax]
-        @minimal_quantity = args.fetch(:minimal_quantity, 1)
-        @default_on       = args.fetch(:default_on, 0)
-        @available_date   = Date.today.strftime("%F")
-        @quantity         = args.fetch(:quantity, 0)
+        @id                 = args[:id]
+        @id_product         = args.fetch(:id_product)
+        @location           = args[:location]
+        @ean13              = args[:ean]
+        @upc                = args[:upc]
+        @quantity           = args.fetch(:quantity, 0)
+        @reference          = args.fetch(:reference)
+        @supplier_reference = args[:supplier_reference]
+        @wholesale_price    = args[:wholesale_price]
+        @price              = args[:price]
+        @ecotax             = args[:ecotax]
+        @weight             = args[:weight]
+        @unit_price_impact  = args[:unit_price_impact]
+        @minimal_quantity   = args.fetch(:minimal_quantity, 1)
+        @default_on         = args.fetch(:default_on, 0)
+        @available_date     = Date.today.strftime("%F")
+
+        @id_product_options = args[:id_product_options]
+        @id_images          = args[:id_images]
+
+        @id_lang            = args.fetch(:id_lang)
       end
 
-      def vat
-        original_price ? original_price[:vat] : 0
+      # ID of combination, or find ID by +reference+ and +id_product+
+      def id
+        @id ||= self.class.find_by 'filter[reference]' => reference, 'filter[id_product]' => id_product
       end
-
-      def price
-        original_price ? product_price + Helper.calculate_price(original_price, vat) : 0
-      end
+      alias :find? :id
 
       def hash
         combination = {
@@ -48,45 +51,19 @@ module Prestashop
           quantity:           quantity,
           associations: {}
         }
-        if product_options
+        if id_product_options
           combination[:associations][:product_option_values] = {}
-          combination[:associations][:product_option_values][:product_option_value] = hash_ids(product_options)
+          combination[:associations][:product_option_values][:product_option_value] = hash_ids(id_product_options)
         end
-        if images
+        if id_images
           combination[:associations][:images] = {}
-          combination[:associations][:images][:image] = hash_ids(images)
+          combination[:associations][:images][:image] = hash_ids(id_images)
         end
         combination
       end
 
-      # Find combination by +reference+ and +id_product+, returns +id+
-      def id
-        @id ||= self.class.find_by 'filter[reference]' => reference, 'filter[id_product]' => id_product
-      end
-      alias :find? :id
-
-      def create 
-        response = super
-        if response
-          StockAvailable.new(id_product: id_product, id_product_attribute: response[:id]).update(quantity: quantity)
-        end
-        response
-      end
-
       def update options = {}
         self.class.update(id, options)
-      end
-
-      def product_options= product_options
-        @product_options = []
-        product_options.each do |product_option|
-          id_o = ProductOption.new(name: product_option[:name]).find_or_create
-          @product_options << ProductOptionValue.new(name: product_option[:value], id_attribute_group: id_o).find_or_create
-        end
-      end
-
-      def images= images
-        @images = Image.new(resource: 'products', resource_id: id_product, source: images).upload
       end
 
       class << self

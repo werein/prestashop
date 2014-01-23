@@ -5,8 +5,6 @@ module Prestashop
     describe Image do
       let(:image) { Image.new(attributes_for(:image_basic)) }
       before do 
-        Client.stubs(:id_language).returns(2)
-
         xml = <<-EOT
         <prestashop xmlns:xlink="http://www.w3.org/1999/xlink">
           <image_types>

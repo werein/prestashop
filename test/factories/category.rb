@@ -6,5 +6,7 @@ FactoryGirl.define do
     active 1
     name 'Apple'
     description 'Apple category'
+
+    id_lang 2
   end
 end

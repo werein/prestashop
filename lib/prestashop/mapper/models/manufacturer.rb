@@ -5,19 +5,24 @@ module Prestashop
       resource :manufacturers
       model    :manufacturer
 
-      attr_accessor :id, :id_lang, :active
-      attr_writer :name, :description, :short_description, :meta_title, :meta_description, :meta_keywords
+      attr_accessor :id, :active
+      attr_accessor :id_lang
+      attr_writer :link_rewrite, :name, :description, :short_description, :meta_title, :meta_description, :meta_keywords
 
       def initialize args = {}
         @id                 = args[:id]
-        @id_lang            = args.fetch(:id_lang, Client.id_language)
         @active             = args.fetch(:active, 1)
+        @link_rewrite       = args[:link_rewrite]
         @name               = args[:name]
+        # date_add
+        # date_upd
         @description        = args[:description]
         @short_description  = args[:short_description]
         @meta_title         = args[:meta_title]
         @meta_description   = args[:meta_description]
         @meta_keywords      = args[:meta_keywords]
+
+        @id_lang            = args.fetch(:id_lang)
       end
 
       def name
@@ -48,7 +53,7 @@ module Prestashop
           manufacturer = self.class.find_in_cache name
           unless manufacturer
             manufacturer = create
-            settings.clear_manufacturers_cache
+            Client.clear_manufacturers_cache
           end
           manufacturer[:id]
         end
@@ -62,7 +67,7 @@ module Prestashop
 
       class << self
         def find_in_cache name
-          settings.manufacturers_cache.find{|m| m[:name] == name } if settings.manufacturers_cache
+          Client.manufacturers_cache.find{|m| m[:name] == name } if Client.manufacturers_cache
         end
 
         def cache

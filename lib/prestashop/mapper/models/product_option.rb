@@ -5,15 +5,19 @@ module Prestashop
       resource :product_options
       model :product_option
 
-      attr_accessor :id_lang, :is_color_group, :position, :group_type, :name, :public_name
+      attr_accessor :id, :is_color_group, :group_type, :position, :name
+      attr_writer   :public_name
+      attr_accessor :id_lang
 
       def initialize args = {}
-        @id_lang      = args.fetch(:id_lang, Client.id_language)
+        @id             = args[:id]
         @is_color_group = args.fetch(:is_color_group, 0)
-        @position     = args[:position]
-        @group_type   = args.fetch(:group_type, 'select')
-        @name         = args.fetch(:name)
-        @public_name  = args[:public_name]
+        @group_type     = args.fetch(:group_type, 'select')
+        @position       = args[:position]
+        @name           = args.fetch(:name)
+        @public_name    = args[:public_name]
+
+        @id_lang        = args.fetch(:id_lang)
       end
 
       def public_name
@@ -46,8 +50,17 @@ module Prestashop
       end
 
       class << self
+        def create_from_hash product_options, id_lang
+          result = []
+          product_options.each do |product_option|
+            id_o = ProductOption.new(name: product_option[:name], id_lang: id_lang).find_or_create
+            result << ProductOptionValue.new(name: product_option[:value], id_attribute_group: id_lang, id_lang: id_lang).find_or_create
+          end if product_options
+          result
+        end
+
         def find_in_cache name, id_lang
-          Client.options_cache.find{|k| k[:name].lang_search(name, id_lang) } if Client.options_cache
+          Client.options_cache.find{|k| k[:name].find_lang(name, id_lang) } if Client.options_cache
         end
 
         def cache

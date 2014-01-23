@@ -4,8 +4,8 @@ module Prestashop
   module Mapper
     describe Category do
       let(:category) { Category.new(attributes_for(:category)) }
+      let(:id_lang) { 2 }
       before do
-        Client.stubs(:id_language).returns(2)
         xml = <<-EOF
         <?xml version="1.0" encoding="UTF-8"?>
         <prestashop xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -40,19 +40,23 @@ module Prestashop
       end
 
       it "should have valid name" do 
-        cat = Category.new(attributes_for(:category, name: ';#Apple<>' + LONG_STRING))
-        cat.name.length.must_equal 61
+        category.name = ';#Apple<>'
+        category.name.must_equal 'Apple'
+        category.name = LONG_STRING
+        category.name.length.must_equal 61
       end
 
       it "should have valid description" do 
-        cat = Category.new(attributes_for(:category, description: ';#<a>Apple</a>' + LONG_STRING))
-        cat.description.length.must_equal 252
+        category.description = ';#<a>Apple</a>'
+        category.description.must_equal ';#Apple'
+        category.description = LONG_STRING
+        category.description.length.must_equal 252
       end
 
       it "should have valid link rewrite" do 
         category.link_rewrite.must_equal 'apple'
-        cat = Category.new(attributes_for(:category, link_rewrite: 'Apple iPhone'))
-        cat.link_rewrite.must_equal 'apple-iphone'
+        category.link_rewrite = 'Apple iPhone'
+        category.link_rewrite.must_equal 'apple-iphone'
       end
 
       it "should look for category in cache" do 
@@ -81,42 +85,25 @@ module Prestashop
 
       it "should create from name" do
         cat = mock('category')
-        Client.stubs(:delimiter).returns('|')
         Category.expects(:new).returns(cat)
         cat.expects(:find_or_create).once
-        Category.create_from_name 'Apple'
+        Category.create_from_name 'Apple', id_lang
       end
 
-      it "should generate correct hash from string" do
-        cat_name = 'Apple||iPhone'
-        Category.stubs(:create_from_name).with(cat_name).returns([1,2])
-        Category.resolver(cat_name).must_equal({id_category_default: 2, ids_category: [1,2]})
+      it "should create from name" do
+        cat = mock('category')
+        cat.stubs(:find_or_create).returns(3)
+        Category.expects(:new).with({name: 'Apple', id_parent: 2, id_lang: id_lang}).returns(cat)
+        Category.expects(:new).with({name: 'iPhone', id_parent: 3, id_lang: id_lang}).returns(cat)
+        Category.create_from_name 'Apple||iPhone', id_lang
       end
 
       it "should generate correct hash from array" do 
         cat_name = 'Apple||iPhone||Accessories'
         cat_name2 = 'Apple||Accessories'
-        Category.stubs(:create_from_name).with(cat_name).returns([1,2,3])
-        Category.stubs(:create_from_name).with(cat_name2).returns([1,4])
-        Category.resolver([cat_name, cat_name2]).must_equal({id_category_default: 4, ids_category: [1,2,3,4]})
-      end
-
-      it "should generate correct hash from hash" do 
-        cat_name = 'Apple||iPhone||Accessories'
-        cat_name2 = 'Apple||Accessories'
-        Category.stubs(:create_from_name).with(cat_name).returns([1,2,3])
-        Category.stubs(:create_from_name).with(cat_name2).returns([1,4])
-        Category.resolver(default: cat_name, secondary: cat_name2).must_equal({id_category_default: 3, ids_category: [1,2,3,4]})
-      end
-
-      it "should generate correct hash from hash and array" do 
-        cat_name = 'Apple||iPhone||Accessories'
-        cat_name2 = 'Apple||Accessories'
-        cat_name3 = 'Apple||Car'
-        Category.stubs(:create_from_name).with(cat_name).returns([1,2,3])
-        Category.stubs(:create_from_name).with(cat_name2).returns([1,4])
-        Category.stubs(:create_from_name).with(cat_name3).returns([1,5])
-        Category.resolver(default: cat_name, secondary: [cat_name2, cat_name3]).must_equal({id_category_default: 3, ids_category: [1,2,3,4,5]})
+        Category.stubs(:create_from_name).with(cat_name, id_lang).returns([1,2,3])
+        Category.stubs(:create_from_name).with(cat_name2, id_lang).returns([1,4])
+        Category.create_from_names([cat_name, cat_name2], id_lang).must_equal([1,2,3,4])
       end
     end 
   end
