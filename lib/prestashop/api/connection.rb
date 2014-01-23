@@ -75,9 +75,8 @@ module Prestashop
       # * +id+        - ID of requested item, not required
       #
       def head resource, id = nil
-        id.to_i
         raise ArgumentError, "resource: #{resource} must be string or symbol" unless resource.kind_of?(String) or resource.kind_of?(Symbol)
-        raise ArgumentError, "id: #{id} must be integer or nil" unless id.kind_of?(Integer) or id == nil
+        raise ArgumentError, "id: #{id} must be integer or nil" unless id.to_i.kind_of?(Integer) or id == nil
         
         request_path = path(resource, id)
         response = connection.head request_path
@@ -152,9 +151,8 @@ module Prestashop
       # * +:payload+  - posted attachement
       #
       def put resource, id, payload
-        id.to_i
         raise ArgumentError, "resource: #{resource} must be string or symbol" unless resource.kind_of?(String) or resource.kind_of?(Symbol)
-        raise ArgumentError, "id: #{id} must be integer" unless id.kind_of?(Integer)
+        raise ArgumentError, "id: #{id} must be integer" unless id.to_i.kind_of?(Integer)
 
         request_path = path(resource, id)
         response = connection.put request_path, payload
@@ -175,9 +173,8 @@ module Prestashop
       # * +:id+       - ID of deleted item
       #
       def delete resource, id
-        id.to_i
         raise ArgumentError, "resource: #{resource} must be string or symbol" unless resource.kind_of?(String) or resource.kind_of?(Symbol)
-        raise ArgumentError, "id: #{id} must be integer" unless id.kind_of?(Integer)
+        raise ArgumentError, "id: #{id} must be integer" unless id.to_i.kind_of?(Integer)
 
         request_path = path(resource, id)
         response = connection.delete request_path
@@ -200,10 +197,9 @@ module Prestashop
       # * +file+      - Original file
       #
       def upload type, resource, id, payload, file
-        id.to_i
         raise ArgumentError, "type: #{type} must be string or symbol" unless resource.kind_of?(String) or resource.kind_of?(Symbol)
         raise ArgumentError, "resource: #{resource} must be string or symbol" unless resource.kind_of?(String) or resource.kind_of?(Symbol)
-        raise ArgumentError, "id: #{id} must be integer" unless id.kind_of?(Integer)
+        raise ArgumentError, "id: #{id} must be integer" unless id.to_i.kind_of?(Integer)
 
         request_path = upload_path(type, resource, id)
         response = connection.post request_path, payload
