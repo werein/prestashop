@@ -20,10 +20,6 @@ module Prestashop
         @meta_keywords ? @meta_keywords.plain.truncate(61) : name.split(' ').join(', ')
       end
 
-      def lang value = nil
-        { language: { val: value, attr: { id: settings.id_language }}} if value
-      end
-
       def hash_lang name, id_lang
         { language: { val: name, attr: { id: id_lang }}} if name
       end

@@ -38,15 +38,6 @@ module Prestashop
           reject{|k,v| v.nil? or v.empty?}
         end
 
-        def lang_search value, id_lang = nil
-          id_lang = Prestashop::Client.settings.id_language unless id_lang
-          if self[:language].kind_of?(Array) 
-            self[:language].find{|l| l[:val] == value and l[:attr][:id] == id_lang}
-          else
-            self[:language][:val] == value and self[:language][:attr][:id] == id_lang
-          end
-        end
-
         def find_lang value, id_lang
           if self[:language].kind_of?(Array) 
             self[:language].find{|l| l[:val] == value and l[:attr][:id] == id_lang}
