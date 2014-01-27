@@ -54,7 +54,7 @@ module Prestashop
           result = []
           product_options.each do |product_option|
             id_o = ProductOption.new(name: product_option[:name], id_lang: id_lang).find_or_create
-            result << ProductOptionValue.new(name: product_option[:value], id_attribute_group: id_lang, id_lang: id_lang).find_or_create
+            result << ProductOptionValue.new(name: product_option[:value], id_attribute_group: id_o, id_lang: id_lang).find_or_create
           end if product_options
           result
         end
