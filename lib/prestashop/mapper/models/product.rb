@@ -9,9 +9,9 @@ module Prestashop
                     :manufacturer_name, :quantity, :type, :id_shop_default, :supplier_reference, :location, :width, :height, :depth, 
                     :weight, :quantity_discount, :ean13, :upc, :cache_is_pack, :cache_has_attachment, :is_virtual, :on_sale, :online_only, :ecotax, :minimal_quantity,
                     :price, :wholesale_price, :unity, :unit_price_ratio, :additional_shipping_cost, :customizable, :text_fields, :uploadable_files, :active,
-                    :redirect_type, :id_product_redirect, :available_for_order, :available_date, :condition, :show_price, :indexed, :visibility, :advanced_stock_management
+                    :redirect_type, :id_product_redirect, :available_for_order, :available_date, :condition, :show_price, :indexed, :visibility, :advanced_stock_management, :description
       attr_accessor :id_lang, :id_categories, :id_features
-      attr_writer   :id, :name, :description, :description_short, :link_rewrite, :reference, :price, :available_now, :available_later, :meta_description, :meta_keywords, :meta_title
+      attr_writer   :id, :name, :description_short, :link_rewrite, :reference, :price, :available_now, :available_later, :meta_description, :meta_keywords, :meta_title
 
       def initialize args = {}
         @id                         = args[:id]
@@ -80,10 +80,6 @@ module Prestashop
 
       def name
         @name.plain.truncate(125)
-      end
-
-      def description
-        @description
       end
 
       def description_short

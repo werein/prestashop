@@ -16,16 +16,8 @@ module Prestashop
           Sanitize.clean(self.unescape, Sanitize::Config::RESTRICTED)
         end
 
-        def relaxed
-          Sanitize.clean(self.unescape, Sanitize::Config::RELAXED)
-        end
-
         def unescape
           CGI.unescapeHTML(self)
-        end
-
-        def html enabled
-          enabled ? self.unescape : self.relaxed
         end
 
         def truncate number = 0
