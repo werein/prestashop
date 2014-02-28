@@ -43,6 +43,10 @@ module Prestashop
       it "should not take invalid url" do 
         image.uploader('/image/first.com').must_equal false
       end
+
+      it "should rescue not working image path" do 
+        image.uploader('http://notworkingurl.iguess.com/image.png').must_equal false
+      end
     end 
   end
 end

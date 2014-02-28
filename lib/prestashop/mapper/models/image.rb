@@ -39,6 +39,8 @@ module Prestashop
         end
       rescue MiniMagick::Invalid
         false # It's not valid image
+      rescue OpenURI::HTTPError
+        false # Image not found
       end
 
       def payload
