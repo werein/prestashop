@@ -1,12 +1,15 @@
-# Prestashop::Api
+# Prestashop
+[![Build Status][badge-jenkins]][jenkins] [![Issue tracker][badge-jira]][jira] [![Repository][badge-bitbucket]][bitbucket] [![Coverage][badge-simplecov]][simplecov] [![Docs][badge-docs]][docs]
 
-TODO: Write a gem description
+Comunicate with Prestashop from Ruby via Prestashop WebService
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
-    gem 'prestashop-api'
+```ruby
+gem 'prestashop'
+```
 
 And then execute:
 
@@ -14,11 +17,23 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install prestashop-api
+    $ gem install prestashop
 
 ## Usage
 
-TODO: Write usage instructions here
+Connect to your Prestashop WebService
+```ruby
+Prestashop::Client::Implementation.create 'api_key', 'api_url'
+```
+Now you are able to find, create, update or delete.
+
+### API
+
+TODO
+
+### Mapper
+
+TODO
 
 ## Contributing
 
@@ -27,3 +42,16 @@ TODO: Write usage instructions here
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+
+
+[badge-jenkins]: http://jenkins.werein.cz/buildStatus/icon?job=prestashop
+[badge-jira]: http://img.shields.io/badge/Issues-JIRA-blue.svg
+[badge-bitbucket]: http://img.shields.io/badge/Repo-BitBucket-blue.svg
+[badge-simplecov]: http://img.shields.io/badge/Coverage-SimpleCov-brightgreen.svg
+[badge-docs]: http://img.shields.io/badge/Readme-Docs-orange.svg
+
+[jenkins]: http://jenkins.werein.cz/view/gems/job/prestashop
+[jira]: http://jira.werein.cz/browse/PS
+[bitbucket]: https://bitbucket.org/werein/prestashop
+[simplecov]: http://jenkins.werein.cz/view/gems/job/prestashop/ws/coverage/index.html#_AllFiles
+[docs]: http://werein.github.io/private-gems/prestashop/
