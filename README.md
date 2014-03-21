@@ -1,5 +1,5 @@
 # Prestashop
-[![Build Status][badge-jenkins]][jenkins] [![Issue tracker][badge-jira]][jira] [![Repository][badge-bitbucket]][bitbucket] [![Coverage][badge-simplecov]][simplecov] [![Docs][badge-docs]][docs]
+[![Build Status][badge-jenkins]][jenkins] [![Issue tracker][badge-jira]][jira] [![Repository][badge-bitbucket]][bitbucket] [![Coverage][badge-simplecov]][simplecov] [![Guide][badge-guide]][guide]  [![Docs][badge-docs]][docs]
 
 Comunicate with Prestashop from Ruby via Prestashop WebService
 
@@ -48,10 +48,12 @@ TODO
 [badge-jira]: http://img.shields.io/badge/Issues-JIRA-blue.svg
 [badge-bitbucket]: http://img.shields.io/badge/Repo-BitBucket-blue.svg
 [badge-simplecov]: http://img.shields.io/badge/Coverage-SimpleCov-brightgreen.svg
-[badge-docs]: http://img.shields.io/badge/Readme-Docs-orange.svg
+[badge-guide]: http://img.shields.io/badge/Read-Guide-orange.svg
+[badge-docs]: http://img.shields.io/badge/Read-Docs-lightgrey.svg
 
 [jenkins]: http://jenkins.werein.cz/view/gems/job/prestashop
 [jira]: http://jira.werein.cz/browse/PS
 [bitbucket]: https://bitbucket.org/werein/prestashop
 [simplecov]: http://jenkins.werein.cz/view/gems/job/prestashop/ws/coverage/index.html#_AllFiles
-[docs]: http://werein.github.io/private-gems/prestashop/
+[guide]: http://werein.github.io/private-gems/prestashop/
+[docs]: http://jenkins.werein.cz/view/gems/job/prestashop/ws/doc/index.html
