@@ -8,7 +8,10 @@ module Prestashop
     class Connection
       attr_reader :api_key, :api_url
 
-      # Initialize new connection, raise error, when connection test failed.
+      # Create new connection. Raise error, when is not possible validate connection from any reason
+      #
+      #   Prestashop::Api::Connection.new 'TOKEN342', 'mystore.com'
+      #
       def initialize api_key, api_url
         @api_key = api_key
         self.api_url = api_url
@@ -16,11 +19,10 @@ module Prestashop
         raise InvalidCredentials unless self.test
       end
 
-      # Convert given url to url suitable for Prestashop API
+      # Convert url to  suitable for Prestashop API
       #
-      # ==== Parameters:
-      # * +url+ - URL with Prestashop store.
-      #
+      #   @connection.api_url = 'mystore.com' # => http://mystore.com/api/
+      # 
       def api_url= url
         url.gsub!(/^(http|https):\/\//,'')
         url = 'http://' + url
@@ -29,7 +31,9 @@ module Prestashop
         @api_url = url
       end
 
-      # Create connection based on connection instance, returns +Faraday::Connection+ suitable for API call
+      # Create connection based on connection instance, returns +Faraday::Connection+ 
+      # which can be usedo for API call
+      #
       def connection
         Faraday.new do |builder|
           builder.url_prefix = api_url
@@ -44,12 +48,8 @@ module Prestashop
 
       # Generate path for API request
       #
-      # ==== Parameters:
-      # * +:resource+ [String, Symbol] - Resource of requested item.
-      # * +:id+       [Integer, Array] - Requested object id or ids.
-      #
-      # ==== Example:
       #   path(:customers, 1) # => "customers/1"
+      #   path(:customers, [1, 5]) # => "customers?id=[1,5]"
       #
       def path resource, id = nil
         path = resource.to_s
@@ -59,20 +59,17 @@ module Prestashop
 
       # Generate path for API upload request
       #
-      # ==== Parameters:
-      # * +:type+       - Type as Image
-      # * +:resource+   - Resource of requested item
-      # * +:id+         - Requested object id
+      #   upload_path :image, :products, 2 # => /images/products/2
       #
       def upload_path type, resource, id
         "#{type}/#{resource}/#{id}"
       end
 
       # Call HEAD on WebService API, returns +true+ if was request successfull or raise error, when request failed.
+      # Can be called as +check+ instead +head+
       #
-      # ==== Parameters:
-      # * +resource+  - Resource of requested item
-      # * +id+        - ID of requested item, not required
+      #   head :customer, 2 # => true
+      #   check :customer, 3 # => true
       #
       def head resource, id = nil
         raise ArgumentError, "resource: #{resource} must be string or symbol" unless resource.kind_of?(String) or resource.kind_of?(Symbol)
@@ -91,11 +88,18 @@ module Prestashop
       alias :check :head
 
       # Call GET on WebService API, returns parsed Prestashop response or raise error, when request failed.
+      # Can be called as +read+ instead +get+
       #
-      # ==== Parameters:
-      # * +resource+  - Resource of requested item
-      # * +id+        - ID of requested item, not required
-      # * +opts+      - Param name, value based on Hash key and value.
+      #   get :customer, 1       # => {id: 1 ...}
+      #   read :customer, [1,2]    # => [{id: 1}, {id: 2}]
+      #
+      # *available options*
+      # * filter
+      # * display
+      # * sort
+      # * limit
+      # * schema
+      # * date
       #
       def get resource, id = nil, opts = {}
         id.to_i unless id.kind_of?(Array)
@@ -123,10 +127,9 @@ module Prestashop
       alias :read :get
 
       # Call POST on WebService API, returns parsed Prestashop response if was request successfull or raise error, when request failed.
+      # Can be called as +create+ insted of +put+
       #
-      # ==== Parameters:
-      # * +:resource+ - Resource of requested item
-      # * +:payload+  - posted attachement
+      #   post :customer, { name: 'Steve' } # => true
       #
       def post resource, payload
         raise ArgumentError, "resource: #{resource} must be string or symbol" unless resource.kind_of?(String) or resource.kind_of?(Symbol)
@@ -144,11 +147,10 @@ module Prestashop
       alias :create :post
 
       # Call PUT on WebService API, returns parsed Prestashop response if was request successfull or raise error, when request failed.
+      # Can be called as +update+ instead +put+
       #
-      # ==== Parameters:
-      # * +:resource+ - Resource of requested item
-      # * +:id+       - ID of updated item
-      # * +:payload+  - posted attachement
+      #   put :customer, 1, {surname: 'Jobs'} # => true
+      #   update :customer, 1, {nope: 'Jobs'} # => false
       #
       def put resource, id, payload
         raise ArgumentError, "resource: #{resource} must be string or symbol" unless resource.kind_of?(String) or resource.kind_of?(Symbol)
@@ -168,9 +170,7 @@ module Prestashop
 
       # Call DELETE on WebService API, returns +true+ if was request successfull or raise error, when request failed.
       #
-      # ==== Parameters:
-      # * +:resource+ - Resource of requested item
-      # * +:id+       - ID of deleted item
+      #   delete :customer, 1 # => true
       #
       def delete resource, id
         raise ArgumentError, "resource: #{resource} must be string or symbol" unless resource.kind_of?(String) or resource.kind_of?(Symbol)
@@ -188,6 +188,8 @@ module Prestashop
       end
 
       # Send file via payload After that call POST on WebService API, returns parsed Prestashop response if was request successfull or raise error, when request failed.
+      #
+      #  upload :image, :customer, 2, {image: '/file/to/path.png'}, file
       #
       # ==== Parameters:
       # * +type+      - Type (image, attachement)
