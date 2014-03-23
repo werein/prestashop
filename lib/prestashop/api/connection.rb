@@ -186,7 +186,7 @@ module Prestashop
       rescue ParserError
         raise ParserError, "Response couldn't be parsed for: #{request_path}. RESPONSE: #{response.body} XML SENT: #{payload}"
       end
-      alias :destroy, :delete
+      alias :destroy :delete
 
 
       # Send file via payload After that call POST on WebService API, returns parsed Prestashop response if was request successfull or raise error, when request failed.
