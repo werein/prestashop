@@ -5,7 +5,6 @@ module Prestashop
 
         # Determinate if model with class resource exists with given id
         #
-        # === Example:
         #   Car.exists?(1) # => true # if given car exist
         #   Car.exists?(2) # => false # if given car don't exist
         #
@@ -16,7 +15,6 @@ module Prestashop
         # Find model by class resource and given id, returns hash
         # with all nodes, based on node name as key, node value as value
         #
-        # === Example:
         #   Car.find(1) # => { id: 1, name: 'BMW' }
         #   Car.find(2) # => nil
         #
@@ -28,7 +26,6 @@ module Prestashop
         # Find model by class resource and params in hash
         # Returns first result, see #where for more informations
         #
-        # === Example:
         #   Car.find_by(name: 'BMW') # => 1
         #
         def find_by options = {}
@@ -39,7 +36,6 @@ module Prestashop
         # Get models all results by class resource, you can specifi what
         # you should to see as result by specifiyng +:display+
         #
-        # === Example:
         #   Car.all # => [1,2,3]
         #   Car.all(display: ['name']) # => [{ name: { language: { attr: { id: 2, href: 'http://localhost.com/api/languages/2'}, val: 'BMW 7'} }]
         #
@@ -54,8 +50,8 @@ module Prestashop
         
         # Get results by class resource and given conditionals
         #
-        # === Example:
         #   Car.where('filter[id_supplier' => 1) # => [1, 2]
+        # 
         def where options = {}
           result = Client.read self.resource, nil, options
           handle_result result, options
@@ -63,7 +59,6 @@ module Prestashop
 
         # Destroy model by class resource and given id
         #
-        # === Example:
         #   Car.destroy(1) # => true
         #
         def destroy id
@@ -73,7 +68,6 @@ module Prestashop
         # Create hash suitable for update, contains #fixed_hash as hash with deleted
         # keys, which shouldn't be in payload, if exist
         #
-        # === Example:
         #   Car.update_hash(1, name: 'BMW7') # => {name: 'BMW7', manufacturer: 'BMW'}
         #
         def update_hash id, options = {}
@@ -83,7 +77,6 @@ module Prestashop
 
         # Create payload for update, converts hash to XML
         #
-        # === Example:
         #   Car.update_payload(1, name: 'BMW 7') # => <prestashop xmlns:xlink="http://www.w3.org/1999/xlink"><car><name><![CDATA[BMW 7]]></name></car></prestashop>
         #
         def update_payload id, options = {}
@@ -92,7 +85,6 @@ module Prestashop
 
         # Update model, with class resource by +id+ and given updates
         #
-        # === Example:
         #   Car.update(1, name: 'BMW 7') # => {id: 1, name: 'BMW 7'}
         #
         def update id, options = {}
@@ -101,6 +93,11 @@ module Prestashop
         end 
 
         private
+          # Handle result to return +id+ or array with +ids+ of requested objects
+          # 
+          #   handle_result({ customers: { customer: [ 1,2 ] } }) # => [1, 2]
+          #   handle_result({ customers: { customer: { attr: { id: 1 }} } }) # => [1]
+          #
           def handle_result result, options = {}
             if options[:display]
               if result[self.resource].kind_of?(Hash) and result[self.resource][self.model]
@@ -122,7 +119,6 @@ module Prestashop
 
         # Generate hash with ID
         #
-        # === Example:
         #   car.hash_id(1) # => {id: 1}
         #
         def hash_id id
@@ -131,7 +127,6 @@ module Prestashop
 
         # Make array of unique IDs in hash
         #
-        # === Example:
         #   car.hash_ids(1,2,3) # => [{id: 1},{id: 2},{id: 3}]
         # 
         def hash_ids ids
@@ -140,7 +135,6 @@ module Prestashop
 
         # Create payload for create new object, coverts hash to XML
         #
-        # === Example:
         #   car.payload # => '<prestashop xmlns:xlink="http://www.w3.org/1999/xlink"><car><name><![CDATA[BMW 7]]></name><manufacturer><![CDATA[BMW]]></manufacturer></car></prestashop>'
         #
         def payload
@@ -150,8 +144,8 @@ module Prestashop
         # Create new model from instance, based on class resource a payload generated from
         # hash method
         # 
-        # === Example:
         #   Car.new(name: 'BMW 7', manufacturer: 'BMW').create # => { id: 1, name: 'BMW 7', manufacturer: 'BMW' }
+        # 
         def create
           result = Client.create self.class.resource, payload
           result ? result[self.class.model] : nil

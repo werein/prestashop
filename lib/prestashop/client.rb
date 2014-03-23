@@ -11,6 +11,7 @@ module Prestashop
                     :feature_values_cache, :clear_feature_values_cache, :options_cache, :clear_options_cache, :option_values_cache, :clear_option_values_cache
     
     # Delegate to current user implementation
+    # 
     def self.current
       Implementation.current
     end

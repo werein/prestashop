@@ -93,13 +93,13 @@ module Prestashop
       #   get :customer, 1       # => {id: 1 ...}
       #   read :customer, [1,2]    # => [{id: 1}, {id: 2}]
       #
-      # *available options*
-      # * filter
-      # * display
-      # * sort
-      # * limit
-      # * schema
-      # * date
+      # available options::
+      #   * filter
+      #   * display
+      #   * sort
+      #   * limit
+      #   * schema
+      #   * date
       #
       def get resource, id = nil, opts = {}
         id.to_i unless id.kind_of?(Array)
@@ -186,18 +186,19 @@ module Prestashop
       rescue ParserError
         raise ParserError, "Response couldn't be parsed for: #{request_path}. RESPONSE: #{response.body} XML SENT: #{payload}"
       end
+      alias :destroy, :delete
+
 
       # Send file via payload After that call POST on WebService API, returns parsed Prestashop response if was request successfull or raise error, when request failed.
       #
       #  upload :image, :customer, 2, {image: '/file/to/path.png'}, file
       #
-      # ==== Parameters:
-      # * +type+      - Type (image, attachement)
-      # * +resource+  - Resource of uploaded item
-      # * +id+        - ID of uploaded item
-      # * +payload+   - Attachement in hash with file path
-      # * +file+      - Original file
-      #
+      # @param  type [Type (image, attachement)]
+      # @param  resource [Resource of uploaded item]
+      # @param  id [ID of uploaded item]
+      # @param  payload [Attachement in hash with file path]
+      # @param  file [Original file]
+      # 
       def upload type, resource, id, payload, file
         raise ArgumentError, "type: #{type} must be string or symbol" unless resource.kind_of?(String) or resource.kind_of?(Symbol)
         raise ArgumentError, "resource: #{resource} must be string or symbol" unless resource.kind_of?(String) or resource.kind_of?(Symbol)

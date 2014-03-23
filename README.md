@@ -8,16 +8,8 @@ Comunicate with Prestashop from Ruby via Prestashop WebService
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'prestashop'
+gem 'prestashop', git: 'git@bitbucket.org:werein/prestashop.git', branch: 'master'
 ```
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install prestashop
 
 ## Usage
 
@@ -25,11 +17,62 @@ Connect to your Prestashop WebService
 ```ruby
 Prestashop::Client::Implementation.create 'api_key', 'api_url'
 ```
-Now you are able to find, create, update or delete.
+Now you are able to communicate with Prestashop WebService
 
 ### API
 
-TODO
+To call API request directly you can use this class, for better handling is recomenden to use `Mapper` class.
+
+###### Head / Check
+
+Call HEAD on WebService API, returns +true+ if was request successfull or raise error, when request failed.
+
+``` ruby
+Client.head :customer, 2 # => true
+Client.check :customer, 3 # => true
+```
+
+###### Get / Read
+
+Call GET on WebService API, returns parsed Prestashop response or raise error, when request failed.
+
+```ruby
+Client.get :customer, 1       # => {id: 1 ...}
+Client.read :customer, [1,2]  # => [{id: 1}, {id: 2}]
+```
+
+**Available options:**
+
+* filter
+* display
+* sort
+* limit
+* schema
+* date
+
+###### Post / Create
+Call POST on WebService API, returns parsed Prestashop response if was request successfull or raise error, when request failed.
+
+```ruby
+Client.post :customer, { name: 'Steve' } # => true
+```
+
+###### Put / Update
+
+Call PUT on WebService API, returns parsed Prestashop response if was request successfull or raise error, when request failed.
+
+```ruby
+Client.put :customer, 1, {surname: 'Jobs'} # => true
+Client.update :customer, 1, {nope: 'Jobs'} # => false
+```
+
+###### Delete / Destroy
+
+Call DELETE on WebService API, returns +true+ if was request successfull or raise error, when request failed.
+
+```ruby
+Client.delete :customer, 1 # => true
+```
 
 ### Mapper
 
