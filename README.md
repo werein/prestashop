@@ -76,7 +76,7 @@ Client.delete :customer, 1 # => true
 
 ### Mapper
 
-TODO..
+TODO
 
 ## Contributing
 
