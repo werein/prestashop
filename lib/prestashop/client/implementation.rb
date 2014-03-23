@@ -6,12 +6,7 @@ module Prestashop
       include Singleton
       attr_reader :connection, :cache
 
-      # Initialize new client
-      #
-      # ==== Parameters:
-      # * +api_key+ - see #Api::Connection.new
-      # * +api_url+ - see #Api::Connection.new
-      # * +settings+ - see #Settings.new
+      # Initialize new client see +Api::Connection#new+
       #
       def initialize api_key, api_url
         @connection = Api::Connection.new api_key, api_url
@@ -19,13 +14,16 @@ module Prestashop
       end
 
       class << self
-        # Create new user implementation, keep it in current thread to allow multithearding, see (#new)
+
+        # Create new user implementation, keep it in current thread to allow multithearding, see +#new+
+        #
         def create api_key, api_url
           Thread.current[:prestashop_client] = new api_key, api_url
           current
         end
 
-        # Return current client or raise exception, when client isn't initialized
+        # Get current client or raise exception, when client isn't initialized
+        #
         def current
           Thread.current[:prestashop_client] ? Thread.current[:prestashop_client] : raise(UnitializedClient)
         end

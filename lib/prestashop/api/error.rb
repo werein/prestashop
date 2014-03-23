@@ -1,18 +1,18 @@
 module Prestashop
   module Api
-    class InvalidCredentials < RuntimeError #:nodoc:
-      def initialize
+    class InvalidCredentials < RuntimeError
+      def initialize 
         super "Your credentials are invalid" 
       end
     end
 
-    class RequestFailed < RuntimeError #:nodoc:
+    class RequestFailed < RuntimeError
       attr_reader :response
       def initialize response
         @response = response
       end
     end
 
-    class ParserError < RuntimeError; end #:nodoc:
+    class ParserError < RuntimeError; end
   end
 end

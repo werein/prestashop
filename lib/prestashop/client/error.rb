@@ -1,6 +1,6 @@
 module Prestashop
   module Client
-    class UnitializedClient < RuntimeError #:nodoc:
+    class UnitializedClient < RuntimeError
       def initialize
         super "Client isn't initialized"
       end
