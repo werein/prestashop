@@ -33,19 +33,22 @@ module Prestashop
         image.upload.must_equal([10,13])
       end
 
-      it "should perform upload" do
-        WebMock.allow_net_connect!
-        Client.expects(:upload)
-        image.uploader('http://upload.wikimedia.org/wikipedia/en/b/bc/Wiki.png')
-        image.file.expects(:format).never
-      end
-
       it "should not take invalid url" do 
         image.uploader('/image/first.com').must_equal false
       end
 
-      it "should rescue not working image path" do 
-        image.uploader('http://notworkingurl.iguess.com/image.png').must_equal false
+      describe "working connection" do 
+        before { WebMock.allow_net_connect! }
+
+        it "should perform upload" do
+          Client.expects(:upload)
+          image.uploader('http://upload.wikimedia.org/wikipedia/en/b/bc/Wiki.png')
+          image.file.expects(:format).never
+        end
+
+        it "should rescue not working image path" do 
+          image.uploader('http://notworkingurl.iguess.com/image.png').must_equal false
+        end
       end
     end 
   end
