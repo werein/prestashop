@@ -7,10 +7,14 @@ describe 'String' do
   end
 
   it "should remove all html tags" do 
-    "I'm <a>Link</a>".clean.must_equal "I'm Link"
+    "I'm <a>Link</a><>".clean.must_equal "I'm Link"
   end
 
   it "should keep some tags" do 
-    "I'm <a>Link</a> and <b>bold</b>".restricted.must_equal "I'm Link and <b>bold</b>"
+    "I'm <a>Link</a> and <b>bold</b><>".restricted.must_equal "I'm Link and <b>bold</b>"
+  end
+
+  it "should unescape" do
+    "<>".restricted.must_equal ""
   end
 end
