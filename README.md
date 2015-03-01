@@ -1,5 +1,5 @@
 # Prestashop
-[![Build Status][badge-jenkins]][jenkins] [![Issue tracker][badge-jira]][jira] [![Repository][badge-bitbucket]][bitbucket] [![Coverage][badge-simplecov]][simplecov] [![Guide][badge-guide]][guide]  [![Docs][badge-docs]][docs]
+[![Build Status][travis-badge]][travis] [![Code Climate][code-climate-badge]][code-climate] [![Test coverage][coverage-badge]][coverage] [![Gem Version][version-badge]][version] [![Dependency Status][dependenies-badge]][dependenies] 
 
 Prestashop API for Ruby
 
@@ -8,7 +8,7 @@ Prestashop API for Ruby
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'prestashop', git: 'git@bitbucket.org:werein/prestashop.git'
+gem 'prestashop', github: 'werein/prestashop'
 ```
 
 Use `branch: 'master'` for local repository in case of bundler global config
@@ -97,17 +97,13 @@ List of objects can be found on gem docs.
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
 
-
-[badge-jenkins]: http://jenkins.werein.cz/buildStatus/icon?job=prestashop
-[badge-jira]: http://img.shields.io/badge/Issues-JIRA-blue.svg
-[badge-bitbucket]: http://img.shields.io/badge/Repo-BitBucket-blue.svg
-[badge-simplecov]: http://img.shields.io/badge/Coverage-SimpleCov-brightgreen.svg
-[badge-guide]: http://img.shields.io/badge/Read-Guide-orange.svg
-[badge-docs]: http://img.shields.io/badge/Read-Docs-lightgrey.svg
-
-[jenkins]: http://jenkins.werein.cz/view/gems/job/prestashop
-[jira]: http://jira.werein.cz/browse/PS
-[bitbucket]: https://bitbucket.org/werein/prestashop
-[simplecov]: http://jenkins.werein.cz/view/gems/job/prestashop/ws/coverage/index.html#_AllFiles
-[guide]: http://werein.github.io/private-gems/prestashop/
-[docs]: http://jenkins.werein.cz/view/gems/job/prestashop/ws/doc/index.html
+[travis]: https://travis-ci.org/werein/prestashop
+[travis-badge]: https://travis-ci.org/werein/prestashop.svg
+[code-climate]: https://codeclimate.com/github/werein/prestashop
+[code-climate-badge]: https://codeclimate.com/github/werein/prestashop/badges/gpa.svg
+[coverage]: https://codeclimate.com/github/werein/prestashop
+[coverage-badge]: https://codeclimate.com/github/werein/prestashop/badges/coverage.svg
+[version]: http://badge.fury.io/rb/prestashop
+[version-badge]: https://badge.fury.io/rb/prestashop.svg
+[dependencies]: https://gemnasium.com/werein/prestashop
+[dependencies-badge]: ttps://gemnasium.com/werein/prestashop.svg
