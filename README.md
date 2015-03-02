@@ -1,5 +1,5 @@
 # Prestashop
-[![Build Status][travis-badge]][travis] [![Code Climate][code-climate-badge]][code-climate] [![Test coverage][coverage-badge]][coverage] [![Gem Version][version-badge]][version] [![Dependency Status][dependenies-badge]][dependenies] 
+[![Build Status][travis-badge]][travis] [![Code Climate][code-climate-badge]][code-climate] [![Test coverage][coverage-badge]][coverage] [![Gem Version][version-badge]][version] [![Dependency Status][dependencies-badge]][dependencies] 
 
 Prestashop API for Ruby
 
