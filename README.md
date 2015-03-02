@@ -23,7 +23,7 @@ Prestashop::Client::Implementation.create 'api_key', 'api_url'
 
 Now you are able to communicate with Prestashop WebService
 
-### API
+### Low-level API
 
 To call API request directly you can use this class.
 
@@ -82,12 +82,7 @@ Prestashop::Client.delete :customer, 1 # => true
 
 ### Mapper
 
-For better handling with Prestashop is there Mapper class, that will map all Prestashop features to Ruby classes.
-
-List of objects can be found on gem docs.
-
-#### Base methods used in every model
-
+Please read inline docs inside `lib/prestashop/mapper/extension.rb`, available models are defined in `lib/prestashop/mapper/models`
 
 ## Contributing
 
