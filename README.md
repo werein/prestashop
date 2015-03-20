@@ -101,4 +101,4 @@ Please read inline docs inside `lib/prestashop/mapper/extension.rb`, available m
 [version]: http://badge.fury.io/rb/prestashop
 [version-badge]: https://badge.fury.io/rb/prestashop.svg
 [dependencies]: https://gemnasium.com/werein/prestashop
-[dependencies-badge]: ttps://gemnasium.com/werein/prestashop.svg
+[dependencies-badge]: https://gemnasium.com/werein/prestashop.svg
