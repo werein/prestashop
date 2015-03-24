@@ -37,17 +37,19 @@ module Prestashop
         image.uploader('/image/first.com').must_equal false
       end
 
-      describe "working connection" do 
-        before { WebMock.allow_net_connect! }
-
+      describe "'working' connection" do 
         it "should perform upload" do
+          stub_request(:get, 'https://wereinhq.com/logo.png').to_return(status: 201, body: File.read('test/data/logo.png') )
+
           Client.expects(:upload)
-          image.uploader('http://upload.wikimedia.org/wikipedia/en/b/bc/Wiki.png')
+          image.uploader('https://wereinhq.com/logo.png')
           image.file.expects(:format).never
         end
 
-        it "should rescue not working image path" do 
-          image.uploader('http://notworkingurl.iguess.com/image.png').must_equal false
+        it "should rescue not working image path" do
+          stub_request(:get, 'https://wereinhq.com/lgo.png').to_return(status: 404)
+
+          image.uploader('https://wereinhq.com/lgo.png').must_equal false
         end
       end
     end 

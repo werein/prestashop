@@ -9,11 +9,11 @@ module Prestashop
         end
 
         def clean
-          Sanitize.clean self.unescape
+          Sanitize.clean self.unescape.gsub('<>','')
         end
 
         def restricted
-          Sanitize.clean(self.unescape, Sanitize::Config::RESTRICTED)
+          Sanitize.clean(self.unescape.gsub('<>',''), Sanitize::Config::RESTRICTED)
         end
 
         def unescape

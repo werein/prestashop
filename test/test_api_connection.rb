@@ -3,7 +3,7 @@ require_relative 'test_helper'
 module Prestashop
   module Api
     describe Connection do
-      let(:response)      { mock('response') }
+      let(:response)      { "response" }
 
       describe "invalid connection" do 
         it "should not be created" do 

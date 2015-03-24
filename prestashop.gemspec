@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["jiri.kolarik@imin.cz"]
   spec.description   = %q{Prestashop WebService API library}
   spec.summary       = %q{Prestashop WebService API library}
-  spec.homepage      = "https://github.com/werein/prestashop"
+  spec.homepage      = "https://wereihq.com/guides/prestashop"
   spec.license       = "NC"
 
   spec.files         = Dir["{lib}/**/*", "LICENSE.txt", "Rakefile", "README.md"]
@@ -29,4 +29,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "mocha"
   spec.add_development_dependency "simplecov"
   spec.add_development_dependency "minitest"
+  spec.add_development_dependency "codeclimate-test-reporter"
 end
