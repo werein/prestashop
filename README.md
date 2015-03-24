@@ -1,5 +1,6 @@
 # Prestashop
-[![Build Status][travis-badge]][travis] [![Code Climate][code-climate-badge]][code-climate] [![Test coverage][coverage-badge]][coverage] [![Gem Version][version-badge]][version] [![Dependency Status][dependencies-badge]][dependencies] 
+
+[![Build Status](https://travis-ci.org/werein/prestashop.svg)](https://travis-ci.org/werein/prestashop)  [![Code Climate](https://codeclimate.com/github/werein/prestashop/badges/gpa.svg)](https://codeclimate.com/github/werein/prestashop) [![Test coverage](https://codeclimate.com/github/werein/prestashop/badges/coverage.svg)](https://codeclimate.com/github/werein/prestashop) [![Version](https://badge.fury.io/rb/prestashop.svg)](http://badge.fury.io/rb/prestashop) [![Dependencies](https://gemnasium.com/werein/prestashop.svg)](https://gemnasium.com/werein/prestashop)
 
 Prestashop API for Ruby
 
@@ -27,7 +28,7 @@ Now you are able to communicate with Prestashop WebService
 
 To call API request directly you can use this class.
 
-###### Head / Check
+##### Head / Check
 
 Call HEAD on WebService API, returns +true+ if was request successfull or raise error, when request failed.
 
@@ -36,7 +37,7 @@ Prestashop::Client.head :customer, 2 # => true
 Prestashop::Client.check :customer, 3 # => true
 ```
 
-###### Get / Read
+##### Get / Read
 
 Call GET on WebService API, returns parsed Prestashop response or raise error, when request failed.
 
@@ -56,14 +57,14 @@ When you are using get, you can also filter, sort or limit response. In case, wh
 * schema
 * date
 
-###### Post / Create
+##### Post / Create
 Call POST on WebService API, returns parsed Prestashop response if was request successfull or raise error, when request failed.
 
 ```ruby
 Prestashop::Client.post :customer, { name: 'Steve' } # => true
 ```
 
-###### Put / Update
+##### Put / Update
 
 Call PUT on WebService API, returns parsed Prestashop response if was request successfull or raise error, when request failed.
 
@@ -72,7 +73,7 @@ Prestashop::Client.put :customer, 1, {surname: 'Jobs'} # => true
 Prestashop::Client.update :customer, 1, {nope: 'Jobs'} # => false
 ```
 
-###### Delete / Destroy
+##### Delete / Destroy
 
 Call DELETE on WebService API, returns +true+ if was request successfull or raise error, when request failed.
 
@@ -84,6 +85,23 @@ Prestashop::Client.delete :customer, 1 # => true
 
 Please read inline docs inside `lib/prestashop/mapper/extension.rb`, available models are defined in `lib/prestashop/mapper/models`
 
+After reading that you can do something like this
+
+```ruby
+id_lang = Prestashop::Mapper::Language.find_by_iso_code('cs')
+id_supplier = Prestashop::Mapper::Supplier.new(name: 'apple').find_or_create
+
+product = Prestashop::Mapper::Product.new(id_lang: id_lang, id_supplier: id_supplier, reference: 'apple-macbook')
+
+if product.find?
+  product.update price: '1299'
+else
+  product.description = 'My description'
+  product.price = '1299'
+  product.create
+end
+```
+
 ## Contributing
 
 1. Fork it
@@ -91,14 +109,3 @@ Please read inline docs inside `lib/prestashop/mapper/extension.rb`, available m
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
-
-[travis]: https://travis-ci.org/werein/prestashop
-[travis-badge]: https://travis-ci.org/werein/prestashop.svg
-[code-climate]: https://codeclimate.com/github/werein/prestashop
-[code-climate-badge]: https://codeclimate.com/github/werein/prestashop/badges/gpa.svg
-[coverage]: https://codeclimate.com/github/werein/prestashop
-[coverage-badge]: https://codeclimate.com/github/werein/prestashop/badges/coverage.svg
-[version]: http://badge.fury.io/rb/prestashop
-[version-badge]: https://badge.fury.io/rb/prestashop.svg
-[dependencies]: https://gemnasium.com/werein/prestashop
-[dependencies-badge]: https://gemnasium.com/werein/prestashop.svg
