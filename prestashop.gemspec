@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["jiri.kolarik@imin.cz"]
   spec.description   = %q{Prestashop WebService API library}
   spec.summary       = %q{Prestashop WebService API library}
-  spec.homepage      = "https://wereihq.com/guides/prestashop"
+  spec.homepage      = "https://wereinhq.com/guides/prestashop"
   spec.license       = "NC"
 
   spec.files         = Dir["{lib}/**/*", "LICENSE.txt", "Rakefile", "README.md"]
