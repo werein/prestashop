@@ -10,6 +10,8 @@ require 'factory_girl'
 
 require 'prestashop'
 
+WebMock.disable_net_connect!(allow: "codeclimate.com")
+
 # Load factories
 include FactoryGirl::Syntax::Methods
 Dir["#{File.dirname(__FILE__)}/factories/*.rb"].each { |f| require f }
