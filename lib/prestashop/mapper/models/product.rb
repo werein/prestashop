@@ -6,7 +6,7 @@ module Prestashop
       model    :product
 
       attr_accessor :id_manufacturer, :id_supplier, :id_category_default, :new, :cache_default_attribute, :id_tax_rules_group, :position_in_category,
-                    :manufacturer_name, :quantity, :type, :id_shop_default, :supplier_reference, :location, :width, :height, :depth, 
+                    :manufacturer_name, :quantity, :type, :id_shop_default, :supplier_reference, :location, :width, :height, :depth,
                     :weight, :quantity_discount, :ean13, :upc, :cache_is_pack, :cache_has_attachment, :is_virtual, :on_sale, :online_only, :ecotax, :minimal_quantity,
                     :price, :wholesale_price, :unity, :unit_price_ratio, :additional_shipping_cost, :customizable, :text_fields, :uploadable_files, :active,
                     :redirect_type, :id_product_redirect, :available_for_order, :available_date, :condition, :show_price, :indexed, :visibility, :advanced_stock_management, :description
@@ -107,7 +107,7 @@ module Prestashop
       end
 
       def hash
-        product = { 
+        product = {
           id_supplier:          id_supplier,
           id_manufacturer:      id_manufacturer,
           id_category_default:  id_category_default,
@@ -181,6 +181,7 @@ module Prestashop
           product.delete(:quantity)
           product.delete(:type)
           product.delete(:associations)
+          product.delete(:id_default_image)
           product
         end
 
