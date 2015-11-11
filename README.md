@@ -4,6 +4,9 @@
 
 Prestashop API for Ruby
 
+Is extrected from service used for synchronization suppliers catalogue with Prestashop Cloud via API on client side available here https://syncmystore.com/en
+
+
 ## Installation
 
 Add this line to your application's Gemfile:
