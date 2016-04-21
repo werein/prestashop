@@ -23,8 +23,8 @@ module Prestashop
       #
       #   @connection.api_url = 'mystore.com' # => http://mystore.com/api/
       #
-      def api_url= url
-        url.gsub!(/^(http|https):\/\//,'')
+      def api_url= origin_url
+        url = origin_url.gsub(/^(http|https):\/\//,'')
         url = 'http://' + url
         url << '/' unless url.end_with? '/'
         url << 'api/' unless url.end_with? 'api/'
