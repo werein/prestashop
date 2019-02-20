@@ -100,13 +100,14 @@ module Prestashop
       #   * limit
       #   * schema
       #   * date
+      #   * price (product and combination resource only. see http://doc.prestashop.com/display/PS16/Chapter+10+-+Price+management) 
       #
       def get resource, id = nil, opts = {}
         id.to_i unless id.kind_of?(Array)
         raise ArgumentError, "resource: #{resource} must be string or symbol" unless resource.kind_of?(String) or resource.kind_of?(Symbol)
         raise ArgumentError, "id: #{id} must be integer, array or nil" unless id.kind_of?(Integer) or id.kind_of?(Array) or id == nil
 
-        white_list = %w(filter display sort limit schema date)
+        white_list = %w(filter display sort limit schema date price)
         params = {}
         opts.each do |name, value|
           if white_list.include? name.to_s.split('[').first

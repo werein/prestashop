@@ -40,11 +40,7 @@ module Prestashop
         #   Car.all(display: ['name']) # => [{ name: { language: { attr: { id: 2, href: 'http://localhost.com/api/languages/2'}, val: 'BMW 7'} }]
         #
         def all options = {}
-          result = if options[:display] 
-            Client.read self.resource, nil, display: options[:display]
-          else
-            Client.read self.resource
-          end
+          result = Client.read self.resource, nil, options
           handle_result result, options
         end
         
