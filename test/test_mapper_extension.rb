@@ -1,4 +1,4 @@
-require_relative 'test_helper'
+require_relative "test_helper"
 
 module Prestashop
   module Mapper
@@ -12,15 +12,15 @@ module Prestashop
       before do
         Car.stubs(:resource).returns(:cars)
         Car.stubs(:model).returns(:car)
-        stub_request(:get, 'http://123:@localhost.com/api/')
-        connection = Api::Connection.new('123', 'localhost.com')
+        stub_request(:get, "http://localhost.com/api/")
+        connection = Api::Connection.new("123", "localhost.com")
         Client.stubs(:connection).returns(connection)
       end
-  
+
       it "should determinate if exist" do
-        stub_request(:head, 'http://123:@localhost.com/api/cars/1')
+        stub_request(:head, "http://localhost.com/api/cars/1")
         Car.exists?(1).must_equal true
-      end      
+      end
 
       it "should determinate if can find" do
         body = <<-EOT
@@ -33,12 +33,12 @@ module Prestashop
         </prestashop>
         EOT
 
-        result = { id: 1, name: 'BMW' }
-        stub_request(:get, 'http://123:@localhost.com/api/cars/1').to_return(body: body)
+        result = {id: 1, name: "BMW"}
+        stub_request(:get, "http://localhost.com/api/cars/1").to_return(body: body)
         Car.find(1).must_equal result
       end
 
-      it "should get all" do 
+      it "should get all" do
         body = <<-EOT
         <?xml version="1.0" encoding="UTF-8"?>
         <prestashop xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -50,11 +50,11 @@ module Prestashop
         </prestashop>
         EOT
 
-        stub_request(:get, 'http://123:@localhost.com/api/cars').to_return(body: body)        
-        Car.all.must_equal([1,2,3])
+        stub_request(:get, "http://localhost.com/api/cars").to_return(body: body)
+        Car.all.must_equal([1, 2, 3])
       end
 
-      it "should get all with display option" do 
+      it "should get all with display option" do
         body = <<-EOT
         <?xml version="1.0" encoding="UTF-8"?>
         <prestashop xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -71,20 +71,19 @@ module Prestashop
         </prestashop>
         EOT
 
-        result = [ { 
-            id_supplier: 1, 
-            name: { language: { attr: { id: 2 }, val: 'BMW 7'}}
-          }, { 
-            id_supplier: 1, 
-            name: { language: { attr: { id: 2 }, val: 'BMW 5'}}
-          }
-        ]
+        result = [{
+          id_supplier: 1,
+          name: {language: {attr: {id: 2}, val: "BMW 7"}}
+        }, {
+          id_supplier: 1,
+          name: {language: {attr: {id: 2}, val: "BMW 5"}}
+        }]
 
-        stub_request(:get, 'http://123:@localhost.com/api/cars?display=%5Bid_supplier,name%5D').to_return(body: body)        
-        Car.all(display: '[id_supplier,name]').must_equal(result)
+        stub_request(:get, "http://localhost.com/api/cars?display=%5Bid_supplier,name%5D").to_return(body: body)
+        Car.all(display: "[id_supplier,name]").must_equal(result)
       end
 
-      it "should find by filter" do 
+      it "should find by filter" do
         body = <<-EOT
         <?xml version="1.0" encoding="UTF-8"?>
         <prestashop xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -95,60 +94,60 @@ module Prestashop
         </prestashop>
         EOT
 
-        stub_request(:get, 'http://123:@localhost.com/api/cars?filter%5Bid_supplier%5D=1').to_return(body: body)        
-        Car.where('filter[id_supplier]' => '1').must_equal([1,2])
+        stub_request(:get, "http://localhost.com/api/cars?filter%5Bid_supplier%5D=1").to_return(body: body)
+        Car.where("filter[id_supplier]" => "1").must_equal([1, 2])
       end
 
-      it "should destroy by id" do 
-        stub_request(:delete, 'http://123:@localhost.com/api/cars/1')
+      it "should destroy by id" do
+        stub_request(:delete, "http://localhost.com/api/cars/1")
         Car.destroy(1).must_equal(true)
       end
 
-      it "should generate upload hash" do 
-        Car.stubs(:fixed_hash).returns({name: 'BMW 5', manufacturer: 'BMW'})
-        Car.update_hash(1, name: 'BMW 7').must_equal({ name: 'BMW 7', manufacturer: 'BMW' })
+      it "should generate upload hash" do
+        Car.stubs(:fixed_hash).returns({name: "BMW 5", manufacturer: "BMW"})
+        Car.update_hash(1, name: "BMW 7").must_equal({name: "BMW 7", manufacturer: "BMW"})
       end
 
       it "should generate payload for upload" do
         result = '<prestashop xmlns:xlink="http://www.w3.org/1999/xlink"><car><name><![CDATA[Audi]]></name></car></prestashop>'
-        Car.stubs(:update_hash).returns({name: 'Audi'})
-        Car.update_payload(1, name: 'Audi').must_equal result
+        Car.stubs(:update_hash).returns({name: "Audi"})
+        Car.update_payload(1, name: "Audi").must_equal result
       end
 
-      it "should update item" do 
+      it "should update item" do
         request = '<prestashop xmlns:xlink="http://www.w3.org/1999/xlink"><car><id><![CDATA[1]]></id><name><![CDATA[BMW]]></name></car></prestashop>'
         body = '<prestashop xmlns:xlink="http://www.w3.org/1999/xlink"><car><id><![CDATA[1]]></id><name><![CDATA[Audi]]></name></car></prestashop>'
 
-        stub_request(:put, 'http://123:@localhost.com/api/cars/1').with(body: body).to_return(body: body)        
-        stub_request(:get, 'http://123:@localhost.com/api/cars/1').to_return(body: request)        
-        result = { id: 1, name: 'Audi' }
-        Car.update(1, name: 'Audi').must_equal result
+        stub_request(:put, "http://localhost.com/api/cars/1").with(body: body).to_return(body: body)
+        stub_request(:get, "http://localhost.com/api/cars/1").to_return(body: request)
+        result = {id: 1, name: "Audi"}
+        Car.update(1, name: "Audi").must_equal result
       end
 
-      it "should generate id in hash" do 
+      it "should generate id in hash" do
         Car.new.hash_id(1).must_equal({id: 1})
       end
 
-      it "should generate hash of ids" do 
-        Car.new.hash_ids([1,2,3]).must_equal([{id: 1},{id: 2},{id: 3}])
+      it "should generate hash of ids" do
+        Car.new.hash_ids([1, 2, 3]).must_equal([{id: 1}, {id: 2}, {id: 3}])
       end
 
-      it "should generate payload" do 
+      it "should generate payload" do
         car = Car.new
-        car.stubs(:hash).returns({ name: 'BMW 7', manufacturer: 'BMW' })
+        car.stubs(:hash).returns({name: "BMW 7", manufacturer: "BMW"})
         car.payload.must_equal '<prestashop xmlns:xlink="http://www.w3.org/1999/xlink"><car><name><![CDATA[BMW 7]]></name><manufacturer><![CDATA[BMW]]></manufacturer></car></prestashop>'
       end
 
-      it "should create new object" do 
-        hash = { name: 'BMW 7', manufacturer: 'BMW' }
+      it "should create new object" do
+        hash = {name: "BMW 7", manufacturer: "BMW"}
         payload = '<prestashop xmlns:xlink="http://www.w3.org/1999/xlink"><car><name><![CDATA[BMW 7]]></name><manufacturer><![CDATA[BMW]]></manufacturer></car></prestashop>'
         result = '<prestashop xmlns:xlink="http://www.w3.org/1999/xlink"><car><id><![CDATA[1]]></id><name><![CDATA[BMW 7]]></name><manufacturer><![CDATA[BMW]]></manufacturer></car></prestashop>'
-        stub_request(:post, 'http://123:@localhost.com/api/cars').with(body: payload).to_return(body: result)        
+        stub_request(:post, "http://localhost.com/api/cars").with(body: payload).to_return(body: result)
 
         car = Car.new
         car.stubs(:hash).returns(hash)
         car.create.must_equal(hash.merge(id: 1))
       end
-    end 
+    end
   end
 end
